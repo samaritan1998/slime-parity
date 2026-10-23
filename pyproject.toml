@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "slime-parity"
+version = "0.1.0.dev2"
+description = "Model reference and parallel configuration correctness suites for Slime"
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24"]
+keywords = ["training", "numerics", "gradients", "reproducibility"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+[project.optional-dependencies]
+torch = ["torch>=2.2"]
+hf = ["torch>=2.2", "transformers>=4.51", "safetensors>=0.4"]
+dev = ["build>=1.2", "pytest>=8", "twine>=6"]
+
+[project.scripts]
+training-parity = "training_parity.cli:main"
+slime-parity = "slime_parity.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/samaritan1998/slime-parity"
+Repository = "https://github.com/samaritan1998/slime-parity"
+Issues = "https://github.com/samaritan1998/slime-parity/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
