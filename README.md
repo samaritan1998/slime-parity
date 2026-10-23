@@ -1,5 +1,7 @@
 # Slime Parity
 
+[English](README.md) | [简体中文](README.zh-CN.md)
+
 Validate a Slime model against an independent implementation across a declared
 TP / CP / EP / SP / PP matrix. One model contract defines weights, inputs,
 objective and canonical tensors; the suite enumerates every combination and
