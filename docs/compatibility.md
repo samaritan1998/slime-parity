@@ -22,15 +22,16 @@ Compatibility results apply only to the tested versions and configurations.
 
 ## Current built-in Slime/HF path
 
-The runner accepts fresh local HF weights, ordinary text causal-LM SFT, a common
-sequence length within each case, BSHD or THD input, mirrored two-chunk CP partitioning,
+The native Slime runner accepts fresh local HF weights, ordinary text causal-LM
+SFT, a common sequence length within each case, BSHD or THD input, mirrored two-chunk CP partitioning,
 microbatch size one, uniform PP/VPP layouts and a native distributed Adam
 optimizer. Global batch size must divide evenly across dense DP. It uses a
 constant LR, zero dropout, rollout temperature one and zero MoE auxiliary/z-loss.
 The reference checks both configuration fields and actual dropout modules.
-The reference runs HF
-eager attention with FP32 optimizer parameters; BF16 candidate initial values
-are rounded on both sides. Every nonzero weight-decay group must match the
+The reference runs HF eager attention with independent FP32 optimizer master
+parameters. Model parameters and compute default to FP32; BF16 candidate initial
+values are rounded on both sides. HF microbatch size is configured separately
+from the native runner. Every nonzero weight-decay group must match the
 declared optimizer semantics; models with special parameter groups need a
 dedicated objective adapter.
 
@@ -71,6 +72,44 @@ independently describe its expert order, routing objective and trainable catalog
 Cases must exercise routing sufficiently; the built-in text generator is not
 evidence that every expert/route has been exercised.
 
+## HF reference controls
+
+`slime_parity.adapters.hf:run_reference` requires `training.dtype` to be
+`"float32"` or `"bfloat16"` and accepts these `reference.options`:
+
+| Option | Default | Allowed values and behavior |
+| --- | --- | --- |
+| `compute_dtype` | `"float32"` | `"float32"` or `"bfloat16"`; selects the compute mode |
+| `parameter_dtype` | `"float32"` | `"float32"` or `"bfloat16"`; model parameter storage, independent of FP32 optimizer masters |
+| `micro_batch_size` | `training.global_batch_size` | Positive integer no larger than the global batch; a smaller final microbatch is allowed |
+| `normalization_timing` | `"before_backward"` | Normalize each microbatch objective before backward, or use `"after_backward"` to normalize the accumulated gradients |
+
+BF16 parameter storage requires both `training.dtype` and `compute_dtype` to be
+`"bfloat16"`. FP32 parameters with BF16 compute use autocast; explicit BF16
+parameters run without autocast. Casting parameters preserves buffer dtypes,
+including RoPE frequency buffers. The reference records these controls, parameter
+aliases and buffer dtypes in its runtime metadata.
+
+Both normalization modes use the full batch's supervised-token count as the
+denominator. Each microbatch's autograd gradients are converted to FP32 and
+accumulated before the optimizer step. With `after_backward`, normalization
+follows accumulation. Adam updates independent FP32 masters, then copies them
+back to model parameters, rounding when those parameters are BF16. BF16 autograd
+gradients can already be rounded before FP32 accumulation. HF eager operation
+dtypes can also differ from native BF16; these controls do not reproduce
+Transformer Engine fused wgrad or establish numerical equivalence to it.
+
+Aliases of the same `Parameter` object share one master and one canonical mapping
+entry. Distinct `Parameter` objects sharing storage are rejected. A parameter may
+be unused in some microbatches, but a whole optimizer step without its gradient
+fails explicitly.
+
+The defaults preserve the original full-batch reference behavior. Changing a
+control requires editing the source spec and creating a new plan in a new output
+directory; do not edit a frozen suite or reuse its stage directories. See the
+[configuration example](../examples/README.md#hf-reference-controls). Historical
+GPU results apply to the frozen reference configuration recorded for each run.
+
 ## Scale and launch boundaries
 
 - The default launcher is local `torchrun`; a custom argv launcher can integrate
@@ -82,9 +121,12 @@ evidence that every expert/route has been exercised.
   fragmented layouts can require substantial metadata memory. There is an
   explicit per-shard interval bound, not a proven billion-parameter scale claim.
 - The native observer spills pre-update masters and output snapshots to disk.
-  The built-in HF reference holds its model/optimizer and CPU before-update
-  snapshots in memory. Large references need an offload/distributed adapter;
-  inability to run a reference is a coverage gap, not a pass.
+  The built-in HF reference holds model parameters and gradients, separate FP32
+  masters and gradient accumulators, Adam state, full logits and CPU before-update
+  snapshots in memory. The separate masters and accumulators also exist with the
+  default FP32 model parameters. Microbatching does not remove those allocations.
+  Large references need an offload/distributed adapter; inability to run a
+  reference is a coverage gap, not a pass.
 - Full logits and six parameter-role captures at every step can consume large
   storage. `rank_byte_budget` bounds emitted evidence bytes, not temporary
   snapshots, kernel caches or total filesystem usage. Budget storage accordingly.

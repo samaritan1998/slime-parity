@@ -15,9 +15,48 @@
 3. 经审阅的 HF 参数到原生全局参数的映射。融合 QKV、gate/up、专家编号、权重共享和词表 padding 都属于模型语义。
 4. 测试输入、目标函数、数值门限和并行范围。门限应在验收前确定；缺少门限时只生成误差报告。
 
-内置路径支持 BSHD 或 THD 文本 SFT，要求 token 级归一化、microbatch size 为 1、零 dropout、`rollout_temperature=1`、常数学习率和分布式 Adam。它通过原生 `train()` 连续执行多步训练。THD 会处理 CP 切分后的 TP 对齐填充，但尚不支持将多个变长样本打包进同一 microbatch。其他输入布局、目标函数和优化器状态结构可以注册自己的 runner，并复用观察器和比较层。
+内置 Slime 候选路径支持 BSHD 或 THD 文本 SFT，要求 token 级归一化、microbatch size 为 1、零 dropout、`rollout_temperature=1`、常数学习率和分布式 Adam。它通过原生 `train()` 连续执行多步训练。THD 会处理 CP 切分后的 TP 对齐填充，但尚不支持将多个变长样本打包进同一 microbatch。HF 参考的微批次大小可单独配置。其他输入布局、目标函数和优化器状态结构可以注册自己的 runner，并复用观察器和比较层。
 
 执行器会核对 Slime 解析后的精度参数和实际训练参数 dtype。若所用 Slime 版本强制 BF16，FP32 请求会明确失败，不会记录为已验证的 FP32 运行。HF 参考同时检查配置中的 dropout 字段和实际 dropout 模块。
+
+## 配置 HF 参考的精度和微批次
+
+`slime_parity.adapters.hf:run_reference` 要求 `training.dtype` 为 `"float32"` 或 `"bfloat16"`，并接受以下 `reference.options`。省略这些选项时，沿用 FP32 模型参数、FP32 计算、全局批次一次前向和反向前归一化的默认路径。`training.dtype="bfloat16"` 时，可训练参数的初始值仍先按 BF16 舍入，使参考与候选使用相同的可表示初始值。
+
+| 选项 | 默认值 | 取值与作用 |
+| --- | --- | --- |
+| `compute_dtype` | `"float32"` | `"float32"` 或 `"bfloat16"`；选择参考计算精度 |
+| `parameter_dtype` | `"float32"` | `"float32"` 或 `"bfloat16"`；选择模型参数存储精度，优化器主参数始终为 FP32 |
+| `micro_batch_size` | `training.global_batch_size` | 不超过全局 batch size 的正整数；允许最后一个微批次较小 |
+| `normalization_timing` | `"before_backward"` | `"before_backward"` 在每个微批次反向前归一化；`"after_backward"` 在全部微批次梯度累加后归一化 |
+
+`parameter_dtype="bfloat16"` 要求 `training.dtype` 和 `compute_dtype` 同时为 `"bfloat16"`。FP32 参数配合 BF16 计算时，参考使用 BF16 autocast；显式 BF16 参数路径不启用 autocast。参数转换不改变模型 buffer 的 dtype，例如 RoPE 频率仍保留模型构建时的精度。参考会记录参数别名、buffer dtype 和所选控制项。
+
+两种归一化时机都使用整个全局批次的有效监督 token 数作为分母，不对各微批次的平均 loss 再求平均。每个微批次的 autograd 梯度先转为 FP32，再累加到独立缓冲；`after_backward` 在累加完成后缩放梯度。优化器更新独立 FP32 主参数，再将结果复制回模型参数；BF16 模型参数在复制时舍入。BF16 autograd 梯度可能在转为 FP32 之前已经舍入，因此这些选项不等价于 Transformer Engine 的 fused wgrad，也不能单独证明与原生 BF16 路径数值一致。
+
+同一个 `Parameter` 对象的多个名称共用一份主参数，映射只使用其规范名称一次。不同 `Parameter` 对象共享底层存储时，参考会明确拒绝。参数可以在部分微批次中未参与计算，但若整个 optimizer step 都没有梯度，则该 step 失败。
+
+当 `training.dtype="bfloat16"` 时，可在生成的 suite spec 中使用以下 `reference` 配置。它选择显式 BF16 参数、单样本微批次和累加后归一化；这是新的参考配置，不会改变已有验证结果。
+
+```json
+{
+  "reference": {
+    "runner": "slime_parity.adapters.hf:run_reference",
+    "kind": "independent",
+    "device": "cuda",
+    "options": {
+      "compute_dtype": "bfloat16",
+      "parameter_dtype": "bfloat16",
+      "micro_batch_size": 1,
+      "normalization_timing": "after_backward"
+    }
+  }
+}
+```
+
+编辑源 spec 后，在新的输出目录重新执行 `slime-parity plan`，再运行新计划。不要直接修改已冻结的 `suite.json` 或复用旧 stage 目录。
+
+参考在内存中保留模型、模型梯度、独立 FP32 主参数、FP32 累加缓冲、Adam 状态、完整 logits 和 CPU 更新前快照；即使采用默认 FP32 参数，也会分配独立主参数和累加缓冲。微批次不能消除这些存储开销，大模型可能需要专用的卸载或分布式参考适配器。
 
 ## 定义全局参数映射
 

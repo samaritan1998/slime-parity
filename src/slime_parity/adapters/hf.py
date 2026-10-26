@@ -114,61 +114,145 @@ class HFCausalLMAdapter:
 
 def run_reference(ctx):
     import torch
-    from transformers import AutoModelForCausalLM
     from contextlib import nullcontext
 
-    options = ctx.suite["model"]["options"]
     training = ctx.suite["training"]
+    reference_options = ctx.stage["configuration"]["options"]
+    require(isinstance(reference_options, dict) and set(reference_options) <= {
+        "compute_dtype", "parameter_dtype", "micro_batch_size", "normalization_timing"},
+        "Unknown HF reference option")
+    reference_dtype = reference_options.get("compute_dtype", "float32")
+    parameter_dtype = reference_options.get("parameter_dtype", "float32")
+    micro_batch_size = reference_options.get("micro_batch_size", training["global_batch_size"])
+    normalization_timing = reference_options.get("normalization_timing", "before_backward")
+    require(reference_dtype in ("float32", "bfloat16"), "Unsupported HF reference compute precision")
+    require(parameter_dtype in ("float32", "bfloat16"), "Unsupported HF reference parameter precision")
+    require(training["dtype"] in ("float32", "bfloat16"), "HF adapter currently records FP32 master parameters")
+    require(parameter_dtype != "bfloat16" or
+            (training["dtype"] == "bfloat16" and reference_dtype == "bfloat16"),
+            "BF16 reference parameters require BF16 training and compute precision")
+    require(type(micro_batch_size) is int and 0 < micro_batch_size <= training["global_batch_size"],
+            "Invalid HF reference micro_batch_size")
+    require(normalization_timing in ("before_backward", "after_backward"),
+            "Unsupported HF reference normalization_timing")
+
+    # Reject invalid controls before loading checkpoint weights or creating an optimizer.
+    from transformers import AutoModelForCausalLM
     device = ctx.stage["configuration"]["device"]
     checkpoint = ctx.plan["artifacts"]["hf_checkpoint"]["path"]
     model = AutoModelForCausalLM.from_pretrained(checkpoint, local_files_only=True, trust_remote_code=False,
                                                attn_implementation="eager", torch_dtype=torch.float32).to(device)
     validate_zero_dropout(model)
     model.train()
-    parameters = {n:p for n,p in model.named_parameters() if p.requires_grad}
+    # A tied Parameter object is supported below. Distinct Parameter objects
+    # sharing storage have ambiguous optimizer semantics and cannot be cloned
+    # into independent masters without changing the model.
+    storage_owners = {}
+    for name, parameter in model.named_parameters():
+        if parameter.numel():
+            storage = (parameter.device, parameter.untyped_storage().data_ptr())
+            require(storage not in storage_owners,
+                    f"Distinct HF parameters share storage: {storage_owners.get(storage)} and {name}")
+            storage_owners[storage] = name
+    # Change parameter storage only. Casting the whole module would also round
+    # buffers such as RoPE frequencies, introducing an unrelated model change.
+    with torch.no_grad():
+        for parameter in model.parameters():
+            if training["dtype"] == "bfloat16" and parameter.requires_grad:
+                parameter.copy_(parameter.to(torch.bfloat16).to(torch.float32))
+            parameter.data = parameter.detach().to(dtype=getattr(torch, parameter_dtype))
+    parameters, identities, aliases = {}, {}, {}
+    for name, parameter in model.named_parameters(remove_duplicate=False):
+        if not parameter.requires_grad:
+            continue
+        canonical = identities.setdefault(id(parameter), name)
+        if canonical == name:
+            parameters[name] = parameter
+        else:
+            aliases[name] = canonical
     expressions = read(ctx.plan["artifacts"]["hf_parameter_map"]["path"])
     transform = ParameterTransform({n:list(p.shape) for n,p in parameters.items()}, expressions)
     require(transform.shapes == {n:t["shape"] for n,t in ctx.suite["description"]["parameters"].items()}, "HF trainable catalog changed")
-    dtype = getattr(torch, training["dtype"])
-    require(dtype != torch.float64, "HF adapter currently records FP32 master parameters")
-    # Use the candidate's representable initial values on both sides; compute
-    # precision remains explicitly selectable for an independent reference.
-    if dtype == torch.bfloat16:
-        with torch.no_grad():
-            for p in parameters.values():
-                p.copy_(p.to(torch.bfloat16).to(torch.float32))
-    optimizer = make_optimizer(parameters.values(), training)
-    reference_options = ctx.stage["configuration"]["options"]
-    require(set(reference_options) <= {"compute_dtype"}, "Unknown HF reference option")
-    reference_dtype = reference_options.get("compute_dtype", "float32")
-    require(reference_dtype in ("float32", "bfloat16"), "Unsupported HF reference compute precision")
+    masters = {name: torch.nn.Parameter(parameter.detach().float().clone())
+               for name, parameter in parameters.items()}
+    optimizer = make_optimizer(masters.values(), training)
+    precision = {"compute_dtype": reference_dtype, "parameter_dtype": parameter_dtype,
+                 "master_dtype": "float32", "accumulator_dtype": "float32",
+                 "micro_batch_size": micro_batch_size, "normalization_timing": normalization_timing,
+                 "attention": "hf-eager", "parameter_aliases": aliases,
+                 "buffer_dtypes": {name: str(value.dtype) for name, value in model.named_buffers()},
+                 "limitation": "HF eager/autocast operation dtypes may differ from native BF16. "
+                               "BF16 autograd gradients can round before FP32 accumulation; "
+                               "this does not reproduce Transformer Engine fused wgrad."}
+    ctx.metadata["reference_precision"] = precision
+
     def emit(step, role, values):
         for name,value in transform.apply(values).items():
             ctx.write(step, role, name, value)
+
     for step, data in enumerate(ctx.suite["description"]["inputs"]):
         optimizer.zero_grad(set_to_none=True)
-        before = {n:p.detach().cpu().clone() for n,p in parameters.items()}
+        before = {n:p.detach().cpu().clone() for n,p in masters.items()}
         emit(step, "initial", before)
         tokens = torch.tensor([s["tokens"] for s in data["samples"]], dtype=torch.long, device=device)
         mask = torch.tensor([s["loss_mask"] for s in data["samples"]], dtype=torch.float32, device=device)
-        scope = torch.autocast(device_type=device, dtype=torch.bfloat16) if reference_dtype == "bfloat16" else nullcontext()
-        with scope:
-            output = model(input_ids=tokens, use_cache=False).logits
-            losses = torch.nn.functional.cross_entropy(output[:, :-1].float().reshape(-1, output.shape[-1]),
-                                                       tokens[:, 1:].reshape(-1), reduction="none")
-            loss = (losses * mask[:, 1:].reshape(-1)).sum() / mask[:, 1:].sum()
-        ctx.observe(step, "logits", output)
-        ctx.observe(step, "loss", loss)
-        loss.backward()
-        require(all(p.grad is not None for p in parameters.values()), "Reference has unused trainable parameters; declare their semantics explicitly")
-        emit(step, "gradient", {n:p.grad for n,p in parameters.items()})
+        # Keep the original device FP32 denominator, including in the default
+        # full-batch path. A Python scalar division can round differently.
+        denominator = mask[:, 1:].sum()
+        require(bool(denominator > 0), "HF reference batch has no supervised tokens")
+        accumulated = {name: torch.zeros_like(parameter) for name, parameter in masters.items()}
+        seen_micro_count = {name: 0 for name in parameters}
+        outputs, numerators = [], []
+        for first in range(0, len(data["samples"]), micro_batch_size):
+            model.zero_grad(set_to_none=True)
+            batch_tokens = tokens[first:first + micro_batch_size]
+            batch_mask = mask[first:first + micro_batch_size]
+            # A fresh scope prevents cached casts surviving a master update.
+            scope = (torch.autocast(device_type=device, dtype=torch.bfloat16)
+                     if reference_dtype == "bfloat16" and parameter_dtype == "float32" else nullcontext())
+            with scope:
+                output = model(input_ids=batch_tokens, use_cache=False).logits
+                losses = torch.nn.functional.cross_entropy(output[:, :-1].float().reshape(-1, output.shape[-1]),
+                                                           batch_tokens[:, 1:].reshape(-1), reduction="none")
+                numerator = (losses * batch_mask[:, 1:].reshape(-1)).sum()
+                loss = numerator / denominator
+            outputs.append(output.detach())
+            numerators.append(numerator.detach())
+            (loss if normalization_timing == "before_backward" else numerator).backward()
+            for name, parameter in parameters.items():
+                if parameter.grad is not None:
+                    gradient = parameter.grad.detach().float()
+                    if seen_micro_count[name]:
+                        accumulated[name].add_(gradient)
+                    else:
+                        accumulated[name].copy_(gradient)
+                    seen_micro_count[name] += 1
+        require(all(seen_micro_count.values()),
+                "Reference has unused trainable parameters; declare their semantics explicitly")
+        if normalization_timing == "after_backward":
+            scaling = 1.0 / denominator
+            for gradient in accumulated.values():
+                gradient.mul_(scaling)
+        ctx.observe(step, "logits", outputs[0] if len(outputs) == 1 else torch.cat(outputs, dim=0))
+        ctx.observe(step, "loss", loss.detach() if len(numerators) == 1 else torch.stack(numerators).sum() / denominator)
+        emit(step, "gradient", accumulated)
+        for name, parameter in masters.items():
+            parameter.grad = accumulated[name]
         if training["clip_grad"]:
-            torch.nn.utils.clip_grad_norm_(parameters.values(), training["clip_grad"])
+            torch.nn.utils.clip_grad_norm_(masters.values(), training["clip_grad"])
         optimizer.step()
-        emit(step, "parameter", parameters)
-        emit(step, "update", {n:p.detach().cpu()-before[n] for n,p in parameters.items()})
+        emit(step, "parameter", masters)
+        emit(step, "update", {n:p.detach().cpu()-before[n] for n,p in masters.items()})
         for field in ("exp_avg", "exp_avg_sq"):
-            emit(step, field, {n:optimizer.state[p][field] for n,p in parameters.items()})
-        require(all(int(optimizer.state[p]["step"]) == step + 1 for p in parameters.values()), "HF optimizer step counter differs")
+            emit(step, field, {n:optimizer.state[p][field] for n,p in masters.items()})
+        require(all(int(optimizer.state[p]["step"]) == step + 1 for p in masters.values()), "HF optimizer step counter differs")
+        with torch.no_grad():
+            for name, parameter in parameters.items():
+                parameter.copy_(masters[name])
+        model.zero_grad(set_to_none=True)
         ctx.record_step(step, input_identity=input_identity(data), optimizer_executed=True,
-                        details={"reference": "huggingface-eager", "compute_dtype": reference_dtype})
+                        details={"reference": "huggingface-eager", "compute_dtype": reference_dtype,
+                                 "parameter_dtype": parameter_dtype, "micro_batch_size": micro_batch_size,
+                                 "normalization_timing": normalization_timing,
+                                 "supervised_tokens": sum(sum(s["loss_mask"][1:]) for s in data["samples"]),
+                                 "seen_micro_count": seen_micro_count})

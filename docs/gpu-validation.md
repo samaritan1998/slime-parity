@@ -188,10 +188,13 @@ unchanged. It is a strict diagnostic policy, not a calibrated BF16 recommendatio
 ## Fixes and reproduction
 
 The structured summary includes the frozen library source hashes for each run.
-All 26 library Python files in the full MoE matrix match this publication.
+All 26 library Python files in the full MoE matrix match commit
+[`a57421d`](https://github.com/samaritan1998/slime-parity/commit/a57421d99ed97dabe9a71a909c4a4ffec16f2442).
 The dense matrix used an earlier snapshot without the additional compute-mode
 preflight and environment fields described below; its capture and comparison
-code is identical. The completed CPU regression covers the published source.
+code is identical to that commit. The CPU regression recorded here also applies
+to that snapshot. Later HF reference controls are outside this page's frozen GPU
+evidence.
 
 The GPU work found a THD capture mismatch: Slime slices a sample for CP before
 padding the local stream for TP. Capture now follows that order and excludes
@@ -211,8 +214,8 @@ routing replay. These require a dedicated
 reference/adapter. It records relevant environment switches and rejects an
 unsupported mode instead of silently changing it.
 
-The CPU regression suite passed 124 tests. The synthetic fixture generator
-reproduced every GPU fixture weight exactly, along with the same inputs, mapping
+At that commit, the CPU regression suite passed 124 tests. The synthetic fixture
+generator reproduced every GPU fixture weight exactly, along with the same inputs, mapping
 and training arguments. See [the recipe](../examples/README.md#synthetic-qwen3-gpu-fixtures).
 The generator defaults to no policy; the diagnostic policy must be selected
 explicitly. New model architectures, larger degrees, VPP, multi-node execution,

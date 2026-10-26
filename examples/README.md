@@ -15,6 +15,50 @@ invent model arguments or numerical tolerances. See `--help` and the
 
 Neither CPU fixtures nor generated plans establish Slime GPU compatibility.
 
+## HF reference controls
+
+Both suite generators retain the default HF controls: FP32 model parameters and
+compute, one forward pass for the full global batch, and normalization before backward.
+The reference always optimizes independent FP32 masters. With
+`training.dtype="bfloat16"`, the following fragment selects explicit BF16 model
+parameters, one sample per microbatch and normalization after FP32 gradient
+accumulation. Merge this fragment into the generated spec, replacing its existing
+`reference` section:
+
+```json
+{
+  "reference": {
+    "runner": "slime_parity.adapters.hf:run_reference",
+    "kind": "independent",
+    "device": "cuda",
+    "options": {
+      "compute_dtype": "bfloat16",
+      "parameter_dtype": "bfloat16",
+      "micro_batch_size": 1,
+      "normalization_timing": "after_backward"
+    }
+  }
+}
+```
+
+Save the edited spec as `model-suite-controls.json`, then create and run a new
+plan. The output directory must be new; existing plans and stage evidence remain
+frozen.
+
+```bash
+slime-parity plan --spec model-suite-controls.json --output runs/reference-controls
+slime-parity run --suite runs/reference-controls/suite.json
+```
+
+`parameter_dtype="bfloat16"` requires BF16 training and compute. FP32 parameters
+with BF16 compute use autocast; explicit BF16 parameters do not. Both normalization
+timings use the global supervised-token denominator. BF16 autograd gradients may
+round before FP32 accumulation, so this is not a reproduction of Transformer
+Engine fused wgrad. Separate FP32 masters and accumulators require additional
+memory even under the defaults. See [all controls and limits](../docs/compatibility.md#hf-reference-controls).
+Changing these controls defines a new reference experiment; it does not qualify
+or rewrite the historical GPU results below.
+
 ## Synthetic Qwen3 GPU fixtures
 
 `make_tiny_qwen3_suite.py` reproduces the dense and MoE fixtures used in the GPU
