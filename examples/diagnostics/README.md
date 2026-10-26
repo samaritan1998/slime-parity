@@ -1,5 +1,9 @@
 # Qwen3 RoPE arithmetic diagnostic
 
+For broader forward/backward rounding, joint projections, MoE routing and
+independent AdamW replay, see the [BF16 arithmetic diagnostics](bf16/README.md).
+Those optional controls also remain unqualified development references.
+
 `qwen3_rope_reference.py` changes two parts of the HF reference: default RoPE
 cosine/sine coefficients remain FP32, and split-half Q/K rotation uses FP32
 multiply/add before one final cast to each input's dtype. HF still supplies the

@@ -79,6 +79,39 @@ Global-only gates cannot qualify all required tensors. A numerical failure
 identifies a discrepancy; diagnose reference, mapping, objective and native
 implementation before attributing it to a kernel.
 
+## Diagnose mixed-precision differences
+
+When BF16 arithmetic is the suspected cause, use the optional
+[diagnostic examples](../../examples/diagnostics/bf16/README.md) and their
+[measured scope](../../docs/bf16-contract.md). Their model/version/shape limits
+are local to those examples; they are not defaults for a new model's policy.
+
+Check the actual attention backend, accumulation dtype, joint-projection
+gradients and cast locations. In TP, local GEMM writeback followed by a
+collective can differ from a full-matrix GEMM with one final cast. A W1-native
+comparison helps localize that difference but is not an independent oracle.
+Use captured operands to evaluate independently derived formulas, retaining
+residuals and unobserved intermediate operations. Verify any probe against an
+otherwise identical run using all canonical tensor/step bytes and dtypes.
+
+For MoE, compare each side's own inputs, effective router weights and selected
+sets at every requested step. A route mismatch can amplify small upstream
+differences; local top-k consistency or a spatial association does not qualify
+the full model. Do not force the reference to follow candidate routes.
+
+Recompute masked shifted loss from each side's own logits; check backward
+normalization separately. Identify the actual optimizer implementation and
+replay its moments/update from that side's own captured gradients and previous
+state. Scalar preparation and fused operation order can differ even when
+nominal AdamW hyperparameters match.
+
+Calibrate only after defining the relevant arithmetic contracts and healthy
+controls. Separate calibration data from held-out controls, fix decision rules
+before inspecting held-out results, and test detection of relevant injected
+faults. Generation-only fixtures, repeated identical runs and smaller residuals
+do not establish a qualified tolerance. Preserve the original failed matrix
+and create a new frozen experiment for a changed reference or policy.
+
 Report tested versions, cases, steps, configurations, tolerance scope and gaps.
 Keep CPU observer/geometry tests separate from actual Slime GPU execution.
 The built-in reference/runner is currently fresh text SFT with specified

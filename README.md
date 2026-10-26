@@ -10,15 +10,21 @@ retains both successful results and coverage gaps.
 **Development preview.** CPU execution is tested, including real two-process
 Gloo and local Hugging Face runs. Native Slime execution has also completed
 three-step tiny Qwen3 dense/MoE runs on one and eight GPUs, including mixed
-parallelism. **The frozen numerical gates did not all pass.** Other MoE
-configurations stopped at backend restrictions or evidence-integrity checks
-and remain unverified. See the
-[GPU findings](docs/gpu-validation.md) and [current boundaries](docs/compatibility.md).
+parallelism. **Numerical acceptance still fails.** The latest development matrix
+completes 112 of 128 required rows; 16 MoE rows fail execution and remain
+unverified. No row passes the unchanged numerical policy. See the
+[BF16 findings](docs/bf16-contract.md), [historical GPU findings](docs/gpu-validation.md)
+and [current boundaries](docs/compatibility.md).
 These results do not qualify all Slime models or all parallel configurations.
 
 The [follow-up controls](docs/baseline-controls.md) document explicit HF precision
 settings, RoPE localization and an experimental expert-DP patch. Scoped GPU
 controls confirm the ownership repair; numerical acceptance remains incomplete.
+
+The [BF16 arithmetic record](docs/bf16-contract.md) isolates forward/backward
+rounding, FA2, MoE routing and AdamW scalar preparation, with independent
+diagnostic references and state-replay tools. Errors improve, while threshold
+calibration and held-out acceptance remain unfinished.
 
 Source: [samaritan1998/slime-parity](https://github.com/samaritan1998/slime-parity).
 Install from this repository; a PyPI release is not available yet.

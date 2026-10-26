@@ -9,6 +9,7 @@ distinguishes implemented features from automated test coverage.
 | Actual process-group receipts | Membership, rank coverage, reciprocal groups, commuting axes and Cartesian traversal | Real Gloo DP and synthetic malformed-group rejection |
 | Global parameter mapping | Native checkpoint metadata, factory views, optimizer subranges, multiple chunks, replica agreement across different partition boundaries | CPU geometry, permutation, ownership, missing/overlap tests and real two-rank Gloo replica checks |
 | Independent reference | Explicit MLP and local HF causal LM | Three real optimizer steps in both paths |
+| Optional BF16 arithmetic diagnostics | Explicit Qwen3 dense/MoE formulas and independent AdamW replay, outside the default reference | 84 pinned-HF CPU checks and 23 replay checks; scoped GPU controls remain numerically unqualified in [BF16 findings](bf16-contract.md) |
 | Native Slime execution | Original init/build/load/train; forward and optimizer observers | Three-step tiny Qwen3 dense/MoE execution on one/eight GPUs; numerical failures retained in [GPU findings](gpu-validation.md) |
 | Numerical evidence | Full forward/loss/gradient/actual update/parameters/Adam moments, every step | CPU/GPU capture, local failures and artifact corruption |
 | Packaging and CLI | Python library, console commands, wheel/sdist, CPU CI configuration | Build and CLI tests; hosted results in [Actions](https://github.com/samaritan1998/slime-parity/actions) |
@@ -61,13 +62,16 @@ unmapped shared-parameter aliases and unused reference parameters fail explicitl
 EP and all mixed dimensions are present in the matrix and native mapping path.
 Tiny Qwen3-MoE has GPU execution evidence, including a mixed EP=2 run, but has
 not passed its frozen numerical gates. With the tested backend, TP=1/EP=1/ETP=2
-also failed optimizer-master coverage before training; source inspection and a
+also failed optimizer-master coverage before training in the original run; source inspection and a
 CPU reproduction point to expert parameter grouping. Those configurations
-remain unverified; see the [GPU findings](gpu-validation.md).
+remain unverified in that historical report; see the [GPU findings](gpu-validation.md).
 An [experimental opt-in patch](../examples/patches/README.md) subsequently restored
 ownership and three-step execution in scoped four/eight-GPU controls; an equal
 TP/ETP control remained byte-identical. The [follow-up record](baseline-controls.md)
-retains all numerical failures. The full matrix has not been rerun with that patch.
+retains all numerical failures. The new [BF16 matrix](bf16-contract.md) uses that
+patch with an explicit independent arithmetic reference and preserves the full
+requested domain. Its separate structured record reports execution and numerical
+results; it does not change the original failures or qualify the backend.
 That backend also rejects MoE training with TP>1 and SP disabled, including
 some configurations that pass the planner's generic constraints. Eligible
 planned rows still require native preflight and actual execution evidence.
