@@ -59,6 +59,10 @@ memory even under the defaults. See [all controls and limits](../docs/compatibil
 Changing these controls defines a new reference experiment; it does not qualify
 or rewrite the historical GPU results below.
 
+See the [measured controls](../docs/baseline-controls.md), the explicit
+[RoPE arithmetic diagnostic](diagnostics/README.md) and the version-pinned
+[expert-DP backend patch](patches/README.md) for follow-up experiments.
+
 ## Synthetic Qwen3 GPU fixtures
 
 `make_tiny_qwen3_suite.py` reproduces the dense and MoE fixtures used in the GPU

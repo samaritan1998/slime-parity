@@ -16,6 +16,10 @@ and remain unverified. See the
 [GPU findings](docs/gpu-validation.md) and [current boundaries](docs/compatibility.md).
 These results do not qualify all Slime models or all parallel configurations.
 
+The [follow-up controls](docs/baseline-controls.md) document explicit HF precision
+settings, RoPE localization and an experimental expert-DP patch. Scoped GPU
+controls confirm the ownership repair; numerical acceptance remains incomplete.
+
 Source: [samaritan1998/slime-parity](https://github.com/samaritan1998/slime-parity).
 Install from this repository; a PyPI release is not available yet.
 

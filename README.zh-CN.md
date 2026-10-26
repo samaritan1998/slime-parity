@@ -8,6 +8,8 @@ Slime Parity 用独立参考实现，验证 Slime 模型在指定并行配置范
 
 源码仓库：[samaritan1998/slime-parity](https://github.com/samaritan1998/slime-parity)。目前从仓库安装，尚未发布到 PyPI。
 
+[后续对照记录](docs/baseline-controls.zh-CN.md) 补充了 HF 精度配置、RoPE 差异定位和专家 DP 实验补丁。指定配置的 GPU 对照确认了归属修复，但数值验收仍未完成。
+
 ## 运行 CPU 示例
 
 核心比较库仅依赖 NumPy；训练适配器需要 PyTorch，HF 参考还需要 Transformers。以下命令安装 PyTorch 相关依赖并运行完整 CPU 示例：

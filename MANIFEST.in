@@ -1,6 +1,6 @@
-include README.md README.zh-CN.md LICENSE CONTRIBUTING.md
+include README.md README.zh-CN.md LICENSE CONTRIBUTING.md .gitattributes
 recursive-include .github/workflows *.yml
 recursive-include docs *.md *.json
-recursive-include examples *.json *.py *.md
+recursive-include examples *.json *.py *.md *.patch
 recursive-include skills *.md
 recursive-include tests *.py

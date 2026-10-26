@@ -1,0 +1,17 @@
+--- a/megatron/core/extensions/transformer_engine.py
++++ b/megatron/core/extensions/transformer_engine.py
+@@ -1603,8 +1603,13 @@
+                 **extra_kwargs,
+             )
+             self.te_quant_params: Optional[TEQuantizationParams] = None
++            # With EP=1, unequal attention/expert TP still requires expert-DP
++            # gradient buffers and optimizer ownership for the expert shards.
++            expert_data_parallel = self.expert_parallel or (
++                get_pg_size(self._tp_group) != get_pg_size(pg_collection.tp)
++            )
+             for param in self.parameters():
+-                setattr(param, "allreduce", not (is_expert and self.expert_parallel))
++                setattr(param, "allreduce", not (is_expert and expert_data_parallel))
+ 
+             def merge_extra_states(
+                 self,

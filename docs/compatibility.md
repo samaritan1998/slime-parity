@@ -64,6 +64,10 @@ not passed its frozen numerical gates. With the tested backend, TP=1/EP=1/ETP=2
 also failed optimizer-master coverage before training; source inspection and a
 CPU reproduction point to expert parameter grouping. Those configurations
 remain unverified; see the [GPU findings](gpu-validation.md).
+An [experimental opt-in patch](../examples/patches/README.md) subsequently restored
+ownership and three-step execution in scoped four/eight-GPU controls; an equal
+TP/ETP control remained byte-identical. The [follow-up record](baseline-controls.md)
+retains all numerical failures. The full matrix has not been rerun with that patch.
 That backend also rejects MoE training with TP>1 and SP disabled, including
 some configurations that pass the planner's generic constraints. Eligible
 planned rows still require native preflight and actual execution evidence.
