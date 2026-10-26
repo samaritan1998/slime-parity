@@ -4,7 +4,7 @@ import sys
 
 import torch
 
-from slime_parity.adapters.slime import ForwardCapture
+from slime_parity.adapters.slime import ForwardCapture, native_token_positions
 from slime_parity.topology import Topology
 
 
@@ -59,3 +59,34 @@ def test_full_tp_cp_pp_output_coordinates_include_all_tokens(tmp_path, monkeypat
                     hook.close()
     torch.testing.assert_close(output.reshape(2, 6, 5), full[:, :6, :5])
     assert torch.all(cover == 1)
+
+
+def test_thd_cp_padding_does_not_shift_sample_positions():
+    # Slime first splits a 65-token sample into four 17-token CP chunks.
+    # TP=4 then adds two local padding tokens as a separate THD sequence.
+    t = Topology(world_size=8, tp=4, cp=2)
+    first = native_token_positions(65, t, 0, "thd").tolist()
+    second = native_token_positions(65, t, 1, "thd").tolist()
+    assert first == list(range(17)) + list(range(51, 68)) + [-1, -1]
+    assert second == list(range(17, 51)) + [-1, -1]
+    assert sorted(p for p in first + second if 0 <= p < 65) == list(range(65))
+
+
+def test_thd_without_cp_keeps_tp_padding_outside_sample():
+    t = Topology(world_size=2, tp=2)
+    assert native_token_positions(5, t, 0, "thd", pad_multiplier=2).tolist() == [0, 1, 2, 3, 4, -1, -1, -1]
+
+
+def test_optional_cudnn_inspection_failure_is_recorded(monkeypatch):
+    from slime_parity.context import runtime_environment
+
+    def incompatible():
+        raise RuntimeError("cuDNN version incompatibility")
+
+    monkeypatch.setattr(torch.backends.cudnn, "version", incompatible)
+    monkeypatch.setattr(torch.cuda, "device_count", lambda: 0)
+    monkeypatch.setenv("NVTE_FUSED_ATTN", "0")
+    environment = runtime_environment()
+    assert environment["cudnn"] is None
+    assert environment["cudnn_error"] == "cuDNN version incompatibility"
+    assert environment["backend_environment"]["NVTE_FUSED_ATTN"] == "0"

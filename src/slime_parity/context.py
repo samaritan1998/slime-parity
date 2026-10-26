@@ -13,7 +13,8 @@ from .mapping import torch_chunks
 
 def runtime_environment():
     versions = {}
-    for name in ("slime-parity", "numpy", "torch", "transformers", "megatron-core", "transformer-engine"):
+    for name in ("slime-parity", "numpy", "torch", "transformers", "huggingface-hub", "tokenizers",
+                 "megatron-core", "transformer-engine", "flash-attn", "flash-attn-3", "sglang"):
         try:
             versions[name] = importlib.metadata.version(name)
         except importlib.metadata.PackageNotFoundError:
@@ -22,8 +23,20 @@ def runtime_environment():
     try:
         import torch
         result["cuda_build"] = torch.version.cuda
-        result["cudnn"] = torch.backends.cudnn.version()
+        try:
+            result["cudnn"] = torch.backends.cudnn.version()
+        except RuntimeError as error:
+            # Optional runtime inspection must not abort CUDA workloads that
+            # do not use cuDNN. Preserve the incompatibility in the evidence;
+            # kernels that require that backend still raise their own error.
+            result["cudnn"] = None
+            result["cudnn_error"] = str(error)
         result["cuda_devices"] = [torch.cuda.get_device_name(i) for i in range(torch.cuda.device_count())]
+        result["backend_environment"] = {key: os.environ[key] for key in (
+            "NVTE_FLASH_ATTN", "NVTE_FUSED_ATTN", "NVTE_UNFUSED_ATTN",
+            "CUDA_DEVICE_MAX_CONNECTIONS", "CUBLAS_WORKSPACE_CONFIG",
+            "OPEN_TRAINING_INT4_FAKE_QAT_FLAG", "OPEN_TRAINING_INT4_GROUP_SIZE",
+            "ENABLE_ROUTING_REPLAY", "ROUTING_REPLAY_STAGE") if key in os.environ}
     except ImportError:
         pass
     return result

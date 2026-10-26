@@ -2,7 +2,7 @@
 
 `slime-parity` 将模型语义和并行配置分开：模型适配器定义独立参考、固定输入、目标函数和全局参数坐标；执行器展开 TP、CP、EP、SP、PP 及混合配置。新增模型需要提供一次模型契约，无须为每种并行配置另写比较脚本。
 
-当前已实现完整矩阵编排和原生 Slime 观察器。CPU 路径已经执行验证，Slime GPU 路径仍待真实模型验收。适用范围和未验证项见 [兼容性说明](compatibility.md)。
+当前已实现完整矩阵编排和原生 Slime 观察器。CPU 路径已经执行验证；GPU 实测已完成小型 Qwen3 稠密模型和 MoE 模型的三步运行，但未通过冻结的全部数值门限。具体版本、结果和限制见 [GPU 实测记录](gpu-validation.zh-CN.md) 与 [兼容性说明](compatibility.md)。
 
 ## 准备模型契约
 
@@ -15,7 +15,7 @@
 3. 经审阅的 HF 参数到原生全局参数的映射。融合 QKV、gate/up、专家编号、权重共享和词表 padding 都属于模型语义。
 4. 测试输入、目标函数、数值门限和并行范围。门限应在验收前确定；缺少门限时只生成误差报告。
 
-内置路径要求普通 BSHD 文本 SFT、token 级归一化、microbatch size 为 1、零 dropout、`rollout_temperature=1`、常数学习率和分布式 Adam。它通过原生 `train()` 连续执行多步训练。其他输入布局、目标函数和优化器状态结构可以注册自己的 runner，并复用观察器和比较层。
+内置路径支持 BSHD 或 THD 文本 SFT，要求 token 级归一化、microbatch size 为 1、零 dropout、`rollout_temperature=1`、常数学习率和分布式 Adam。它通过原生 `train()` 连续执行多步训练。THD 会处理 CP 切分后的 TP 对齐填充，但尚不支持将多个变长样本打包进同一 microbatch。其他输入布局、目标函数和优化器状态结构可以注册自己的 runner，并复用观察器和比较层。
 
 执行器会核对 Slime 解析后的精度参数和实际训练参数 dtype。若所用 Slime 版本强制 BF16，FP32 请求会明确失败，不会记录为已验证的 FP32 运行。HF 参考同时检查配置中的 dropout 字段和实际 dropout 模块。
 
@@ -65,7 +65,9 @@ slime-parity plan --spec model-suite.json --output runs/model-plan
 slime-parity report --suite runs/model-plan/suite.json
 ```
 
-生成器不推测架构参数和 BF16 门限。可通过 `--policy /configs/policy.json` 提供规则；未提供时 `policy` 为 `[]`，运行完成后也只会得到 `report_only`。Slime argv 需要包含该版本要求的模型、tokenizer、rollout 计数等参数，以及 `--loss-type sft_loss`、`--calculate-per-token-loss`、`--qkv-format bshd`、零 dropout 和足够的 `--seq-length`。HF 载入需要该版本可用的 bridge 路径。
+生成器不推测架构参数和 BF16 门限。可通过 `--policy /configs/policy.json` 提供规则；未提供时 `policy` 为 `[]`，运行完成后也只会得到 `report_only`。Slime argv 需要包含该版本要求的模型、tokenizer、rollout 计数等参数，以及 `--loss-type sft_loss`、`--calculate-per-token-loss`、零 dropout 和足够的 `--seq-length`。HF 载入需要该版本可用的权重转换路径。
+
+输入布局由 Slime 版本决定。旧版可通过 `--qkv-format` 选择布局；[兼容性说明](compatibility.md) 中固定的公开版本采用 THD，不接受该参数。THD 的 CP 切分与本地 TP 填充顺序不同于 BSHD，观察器会按实际布局还原 token 坐标。
 
 运行器按照 suite 替换并行参数、batch size、学习率、Adam 参数和精度；原生参数验证仍然执行。更复杂的训练目标应使用专门 runner，不能让参考和候选悄悄采用不同目标函数。
 

@@ -4,7 +4,7 @@
 
 Slime Parity 用独立参考实现，验证 Slime 模型在指定并行配置范围内的数值正确性。验证范围涵盖张量并行（TP）、上下文并行（CP）、专家并行（EP）、序列并行（SP）、流水线并行（PP）及其混合组合。模型契约统一定义权重、输入、目标函数和规范张量；执行器枚举全部请求组合，保留验证结果和覆盖缺口。
 
-**当前为开发预览版。** CPU 路径已执行测试，包括真实双进程 Gloo 和本地 Hugging Face 参考。Slime 原生适配器已经实现，但 **GPU 路径尚未完成验证**，目前不承诺所有 Slime 模型或所有并行组合都能通过。适用范围见 [兼容性说明](docs/compatibility.md)。
+**当前为开发预览版。** CPU 路径已执行测试，包括真实双进程 Gloo 和本地 Hugging Face 参考。Slime 原生路径已在 1 卡和 8 卡上完成小型 Qwen3 稠密模型与 MoE 模型的三步运行，包含混合并行配置，但**未通过预先冻结的全部数值门限**。另有 MoE 配置因后端限制或证据完整性检查失败而停止，保持未验证。详见 [GPU 实测记录](docs/gpu-validation.zh-CN.md) 和 [兼容性说明](docs/compatibility.md)。这些结果不代表所有 Slime 模型或并行组合都能通过。
 
 源码仓库：[samaritan1998/slime-parity](https://github.com/samaritan1998/slime-parity)。目前从仓库安装，尚未发布到 PyPI。
 

@@ -1,8 +1,10 @@
 import pytest
+import os
 import sys
 from types import ModuleType, SimpleNamespace
 
-from slime_parity.adapters.slime import replace_arguments, validate_native_precision, validate_native_sft_objective
+from slime_parity.adapters.slime import (replace_arguments, validate_native_precision,
+                                        validate_native_sft_objective, validate_native_compute_modes)
 from training_parity.common import EvidenceError
 
 
@@ -59,3 +61,69 @@ def test_native_sft_rejects_scaled_logits(temperature):
 
 def test_native_sft_accepts_matching_objective():
     validate_native_sft_objective(SimpleNamespace(loss_type="sft_loss", calculate_per_token_loss=True, rollout_temperature=1.0))
+
+
+@pytest.mark.parametrize("flag", ["OPEN_TRAINING_INT4_FAKE_QAT_FLAG", "ENABLE_ROUTING_REPLAY"])
+def test_native_rejects_hidden_compute_modes_even_with_bf16_parameters(monkeypatch, flag):
+    monkeypatch.setenv(flag, "1")
+    with pytest.raises(EvidenceError, match="dedicated adapter"):
+        validate_native_compute_modes(SimpleNamespace(bf16=True, fp8=None, fp4=None))
+    assert os.environ[flag] == "1"  # Never silently disable the requested mode.
+
+
+@pytest.mark.parametrize("field,value", [("fp8", "hybrid"), ("fp4", "nvfp4"),
+    ("fp8_param", True), ("fp8_param_gather", True), ("fp4_param", True), ("use_kitchen", True),
+    ("kitchen_config_file", "recipe.yaml"), ("kitchen_recipe_number", 0),
+    ("activation_func_fp8_input_store", True), ("moe_router_force_load_balancing", True),
+    ("moe_router_force_biased", 0), ("use_routing_replay", True), ("use_rollout_routing_replay", True)])
+def test_native_rejects_declared_quantized_or_forced_compute(monkeypatch, field, value):
+    monkeypatch.delenv("OPEN_TRAINING_INT4_FAKE_QAT_FLAG", raising=False)
+    monkeypatch.delenv("ENABLE_ROUTING_REPLAY", raising=False)
+    with pytest.raises(EvidenceError, match="dedicated adapter"):
+        validate_native_compute_modes(SimpleNamespace(**{field: value}))
+
+
+def test_inactive_quantization_and_replay_settings_do_not_change_compute(monkeypatch):
+    monkeypatch.setenv("OPEN_TRAINING_INT4_FAKE_QAT_FLAG", "0")
+    monkeypatch.setenv("OPEN_TRAINING_INT4_GROUP_SIZE", "128")
+    monkeypatch.setenv("ENABLE_ROUTING_REPLAY", "0")
+    monkeypatch.setenv("ROUTING_REPLAY_STAGE", "replay_forward")
+    assert validate_native_compute_modes(SimpleNamespace()) == {
+        "fp8": None, "fp4": None, "fp8_param": None, "fp8_param_gather": None,
+        "fp4_param": None, "use_kitchen": None, "requested_kitchen_recipe": False,
+        "activation_func_fp8_input_store": None,
+        "moe_router_force_load_balancing": None, "forced_router_bias": None,
+        "fake_int4": False, "routing_replay": False, "requested_routing_replay": False}
+
+
+def test_native_checks_actual_model_quantization_overrides(monkeypatch):
+    import torch
+    monkeypatch.delenv("OPEN_TRAINING_INT4_FAKE_QAT_FLAG", raising=False)
+    monkeypatch.delenv("ENABLE_ROUTING_REPLAY", raising=False)
+    config = SimpleNamespace(activation_func_fp8_input_store=False)
+    utils = ModuleType("megatron.core.utils")
+    utils.get_model_config = lambda model: config
+    monkeypatch.setitem(sys.modules, "megatron", ModuleType("megatron"))
+    monkeypatch.setitem(sys.modules, "megatron.core", ModuleType("megatron.core"))
+    monkeypatch.setitem(sys.modules, "megatron.core.utils", utils)
+    model = torch.nn.Sequential(torch.nn.Linear(2, 2, bias=False, dtype=torch.bfloat16))
+    recipe = SimpleNamespace(override_nonquantized_autocast=False,
+                             fp8_quantization_recipe=object(), fp4_quantization_recipe=None)
+    model[0].te_quant_params = SimpleNamespace(training_recipe=recipe)
+    result = validate_native_compute_modes(SimpleNamespace(fp8_recipe="delayed"), [model])
+    assert result["models"][0]["module_quantization_overrides"][0]["module"] == "0"
+    recipe.override_nonquantized_autocast = True
+    with pytest.raises(EvidenceError, match="quantized training"):
+        validate_native_compute_modes(SimpleNamespace(), [model])
+    recipe.override_nonquantized_autocast = False
+    config.activation_func_fp8_input_store = True
+    with pytest.raises(EvidenceError, match="quantized activations"):
+        validate_native_compute_modes(SimpleNamespace(), [model])
+    config.activation_func_fp8_input_store = False
+    config.fp8_param = True
+    with pytest.raises(EvidenceError, match="dedicated adapter"):
+        validate_native_compute_modes(SimpleNamespace(), [model])
+    config.fp8_param = False
+    config.use_kitchen = True
+    with pytest.raises(EvidenceError, match="dedicated adapter"):
+        validate_native_compute_modes(SimpleNamespace(), [model])

@@ -7,11 +7,14 @@ TP / CP / EP / SP / PP matrix. One model contract defines weights, inputs,
 objective and canonical tensors; the suite enumerates every combination and
 retains both successful results and coverage gaps.
 
-**Development preview.** CPU execution is tested, including a real two-process
-Gloo run and a local Hugging Face reference. The native Slime adapter is
-implemented but has **not been validated on GPUs**. There is
-no claim that all Slime models or all parallel configurations already pass.
-See [current boundaries](docs/compatibility.md).
+**Development preview.** CPU execution is tested, including real two-process
+Gloo and local Hugging Face runs. Native Slime execution has also completed
+three-step tiny Qwen3 dense/MoE runs on one and eight GPUs, including mixed
+parallelism. **The frozen numerical gates did not all pass.** Other MoE
+configurations stopped at backend restrictions or evidence-integrity checks
+and remain unverified. See the
+[GPU findings](docs/gpu-validation.md) and [current boundaries](docs/compatibility.md).
+These results do not qualify all Slime models or all parallel configurations.
 
 Source: [samaritan1998/slime-parity](https://github.com/samaritan1998/slime-parity).
 Install from this repository; a PyPI release is not available yet.

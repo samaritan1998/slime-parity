@@ -1,6 +1,7 @@
 """Checksummed float32/float64 shards aligned by global tensor coordinates."""
 import hashlib
 import math
+from contextlib import ExitStack
 from pathlib import Path
 import numpy as np
 
@@ -190,19 +191,29 @@ def finalize_stage(plan_path, name, *, returncode, provenance="external_launcher
 def aligned_chunks(reference, candidate, key):
     left, right = reference.indices[key], candidate.indices[key]
     li = ri = cursor = 0
-    while li < len(left) and ri < len(right):
-        a, b = left[li], right[ri]
-        end = min(a["end"], b["end"], cursor + CHUNK_ELEMENTS)
-        require(end > cursor, "Invalid shard intersection")
-        arrays = []
-        for stage, piece in ((reference, a), (candidate, b)):
-            dtype = DTYPES[piece["dtype"]]
-            offset = piece["offset_bytes"] + (cursor - piece["start"]) * dtype.itemsize
-            array = np.fromfile(inside(stage.folder, piece["file"]), dtype=dtype, count=end-cursor, offset=offset)
-            require(array.size == end-cursor, "Truncated raw tensor")
-            arrays.append(array)
-        yield arrays[0], arrays[1]
-        cursor = end
-        li += cursor == a["end"]
-        ri += cursor == b["end"]
+    # TP shards can have one interval per row. Keep validated files open for
+    # this tensor instead of resolving and opening them for every intersection.
+    # Bytes-backed arrays remain valid after the generator closes its streams.
+    with ExitStack() as stack:
+        streams = {}
+        while li < len(left) and ri < len(right):
+            a, b = left[li], right[ri]
+            end = min(a["end"], b["end"], cursor + CHUNK_ELEMENTS)
+            require(end > cursor, "Invalid shard intersection")
+            arrays = []
+            for stage, piece in ((reference, a), (candidate, b)):
+                file_key = (id(stage), piece["file"])
+                if file_key not in streams:
+                    streams[file_key] = stack.enter_context(inside(stage.folder, piece["file"]).open("rb"))
+                stream = streams[file_key]
+                dtype = DTYPES[piece["dtype"]]
+                offset = piece["offset_bytes"] + (cursor - piece["start"]) * dtype.itemsize
+                stream.seek(offset)
+                raw = stream.read((end - cursor) * dtype.itemsize)
+                require(len(raw) == (end - cursor) * dtype.itemsize, "Truncated raw tensor")
+                arrays.append(np.frombuffer(raw, dtype=dtype))
+            yield arrays[0], arrays[1]
+            cursor = end
+            li += cursor == a["end"]
+            ri += cursor == b["end"]
     require(li == len(left) and ri == len(right), "Incomplete shard comparison")

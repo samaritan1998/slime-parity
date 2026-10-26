@@ -64,3 +64,63 @@ def test_fp64_squared_underflow_cannot_manufacture_a_pass(tmp_path):
     result=compare(path)
     assert result['status']=='numerical_failure'
     assert result['comparisons']['candidate']['0']['tensors']['gradient/w']['relative_l2']==1
+
+
+def test_fragmented_reads_keep_offsets_and_close_streams(tmp_path, monkeypatch):
+    from pathlib import Path
+    from types import SimpleNamespace
+    from training_parity.storage import aligned_chunks
+
+    # Deliberately store intervals in a different order from global coordinates.
+    # Their intersections also cross the other stage's shard boundaries.
+    key = (0, 'gradient/w')
+    stages = []
+    for name, boundaries in [('left', [(3, 8), (0, 3)]),
+                             ('right', [(5, 8), (0, 2), (2, 5)])]:
+        folder = tmp_path / name
+        folder.mkdir()
+        pieces, offset = [], 0
+        with (folder / 'values.bin').open('wb') as stream:
+            for start, end in boundaries:
+                values = np.arange(start, end, dtype='<f8') + 1e-12
+                stream.write(values.tobytes())
+                pieces.append(dict(start=start, end=end, file='values.bin',
+                                   dtype='float64', offset_bytes=offset))
+                offset += values.nbytes
+        stages.append(SimpleNamespace(folder=folder, indices={key: sorted(pieces, key=lambda p: p['start'])}))
+
+    opened = []
+    original = Path.open
+    def track(path, *args, **kwargs):
+        stream = original(path, *args, **kwargs)
+        opened.append(stream)
+        return stream
+    monkeypatch.setattr(Path, 'open', track)
+    chunks = list(aligned_chunks(*stages, key))
+    for side in (0, 1):
+        np.testing.assert_array_equal(np.concatenate([pair[side] for pair in chunks]),
+                                      np.arange(8, dtype=np.float64) + 1e-12)
+    assert len(opened) == 2 and all(stream.closed for stream in opened)
+    generator = aligned_chunks(*stages, key)
+    next(generator)
+    generator.close()
+    assert all(stream.closed for stream in opened)
+
+
+def test_fragmented_reads_reject_symlink_and_truncation(tmp_path):
+    from types import SimpleNamespace
+    from training_parity.storage import aligned_chunks
+
+    key = (0, 'gradient/w')
+    piece = dict(start=0, end=2, file='values.bin', dtype='float64', offset_bytes=0)
+    stage = SimpleNamespace(folder=tmp_path, indices={key: [piece]})
+    target = tmp_path / 'target.bin'
+    target.write_bytes(np.array([1.], dtype='<f8').tobytes())
+    path = tmp_path / 'values.bin'
+    path.symlink_to(target)
+    with pytest.raises(EvidenceError, match='Symlinked evidence'):
+        list(aligned_chunks(stage, stage, key))
+    path.unlink()
+    path.write_bytes(target.read_bytes())
+    with pytest.raises(EvidenceError, match='Truncated raw tensor'):
+        list(aligned_chunks(stage, stage, key))

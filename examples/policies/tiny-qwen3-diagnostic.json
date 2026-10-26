@@ -1,0 +1,106 @@
+[
+  {
+    "id": "forward",
+    "scope": "tensor",
+    "select": {
+      "roles": [
+        "forward"
+      ]
+    },
+    "limits": {
+      "max_abs": 0.025,
+      "relative_l2": 0.025
+    }
+  },
+  {
+    "id": "loss",
+    "scope": "tensor",
+    "select": {
+      "roles": [
+        "loss"
+      ]
+    },
+    "limits": {
+      "max_abs": 0.01
+    }
+  },
+  {
+    "id": "gradient",
+    "scope": "tensor",
+    "select": {
+      "roles": [
+        "gradient"
+      ]
+    },
+    "limits": {
+      "atol": 0.0001,
+      "rtol": 0.05,
+      "relative_l2": 0.05
+    }
+  },
+  {
+    "id": "initial",
+    "scope": "tensor",
+    "select": {
+      "roles": [
+        "initial"
+      ]
+    },
+    "limits": {
+      "max_abs": 5e-05
+    }
+  },
+  {
+    "id": "parameter",
+    "scope": "tensor",
+    "select": {
+      "roles": [
+        "parameter"
+      ]
+    },
+    "limits": {
+      "max_abs": 5e-05
+    }
+  },
+  {
+    "id": "update",
+    "scope": "tensor",
+    "select": {
+      "roles": [
+        "update"
+      ]
+    },
+    "limits": {
+      "max_abs": 3e-06,
+      "relative_l2": 0.15
+    }
+  },
+  {
+    "id": "exp_avg",
+    "scope": "tensor",
+    "select": {
+      "roles": [
+        "exp_avg"
+      ]
+    },
+    "limits": {
+      "atol": 1e-05,
+      "rtol": 0.05,
+      "relative_l2": 0.05
+    }
+  },
+  {
+    "id": "exp_avg_sq",
+    "scope": "tensor",
+    "select": {
+      "roles": [
+        "exp_avg_sq"
+      ]
+    },
+    "limits": {
+      "atol": 1e-08,
+      "rtol": 0.1,
+      "relative_l2": 0.1
+    }
+  }
+]

@@ -1,8 +1,8 @@
 """Native Slime SFT replay over TP/CP/EP/SP/PP, with optional VPP chunks.
 
 Runs Slime's own train() and train_one_step(), not a replacement training loop.
-The built-in IO path uses BSHD text batches, native distributed Adam, and full
-logits. Other model/loss layouts can register a runner using SlimeStepObserver.
+The built-in IO path uses BSHD or THD text batches, native distributed Adam,
+and full logits. Other model/loss layouts can register a runner using SlimeStepObserver.
 GPU compatibility must be established for the selected Slime/Megatron versions.
 """
 import inspect
@@ -77,6 +77,53 @@ def validate_native_sft_objective(args):
         require(not getattr(args, field, 0), f"Built-in reference does not cover nonzero {field}; register an objective adapter")
 
 
+def validate_native_compute_modes(args, models=None):
+    """Parameter dtype alone does not describe quantized or replayed compute."""
+    def check_configuration(config):
+        values = {name: getattr(config, name, None) for name in (
+            "fp8", "fp4", "fp8_param", "fp8_param_gather", "fp4_param", "use_kitchen",
+            "activation_func_fp8_input_store", "moe_router_force_load_balancing")}
+        values["requested_kitchen_recipe"] = any(getattr(config, name, None) is not None
+                                               for name in ("kitchen_config_file", "kitchen_recipe_number"))
+        values["forced_router_bias"] = getattr(config, "moe_router_force_biased", None)
+        require(not any(v for k, v in values.items() if k != "forced_router_bias")
+                and values["forced_router_bias"] is None,
+                "Built-in reference requires unquantized FP32/BF16 compute and model-defined routing; "
+                "quantized activations or forced routing needs a dedicated adapter")
+        return values
+
+    modes = check_configuration(args)
+    modes["fake_int4"] = os.environ.get("OPEN_TRAINING_INT4_FAKE_QAT_FLAG", "0") == "1"
+    modes["routing_replay"] = os.environ.get("ENABLE_ROUTING_REPLAY", "0") == "1"
+    modes["requested_routing_replay"] = bool(getattr(args, "use_routing_replay", False)
+                                            or getattr(args, "use_rollout_routing_replay", False))
+    require(not any(modes.values()),
+            "Built-in native reference requires unquantized FP32/BF16 compute and fresh routing; "
+            "fake INT4 or routing replay needs a dedicated adapter")
+    if models is not None:
+        from megatron.core.utils import get_model_config
+        modes["models"] = []
+        for chunk, model in enumerate(models):
+            observed = {"chunk": chunk, **check_configuration(get_model_config(model)),
+                        "module_quantization_overrides": []}
+            for name, module in model.named_modules():
+                params = getattr(module, "te_quant_params", None)
+                recipe = getattr(params, "training_recipe", None)
+                if recipe is None:
+                    continue
+                fp8 = getattr(recipe, "fp8_quantization_recipe", None)
+                fp4 = getattr(recipe, "fp4_quantization_recipe", None)
+                override = getattr(recipe, "override_nonquantized_autocast", False)
+                require(not (override and (fp8 is not None or fp4 is not None)),
+                        f"Native module enables quantized training outside the declared precision: {name}")
+                observed["module_quantization_overrides"].append({"module": name,
+                    "override_nonquantized_autocast": bool(override),
+                    "fp8_recipe": None if fp8 is None else type(fp8).__name__,
+                    "fp4_recipe": None if fp4 is None else type(fp4).__name__})
+            modes["models"].append(observed)
+    return modes
+
+
 def create_session(ctx):
     import torch
     import torch.distributed as dist
@@ -126,9 +173,13 @@ def create_session(ctx):
         sys.argv = saved
     require(args.world_size == dist.get_world_size(), "Native argument validation used a different world size")
     validate_native_precision(args, training)
+    ctx.metadata["compute_modes"] = validate_native_compute_modes(args)
     args.rank, args.world_size, args.local_rank = dist.get_rank(), dist.get_world_size(), int(os.environ.get("LOCAL_RANK", "0"))
     validate_native_sft_objective(args)
-    require(args.qkv_format == "bshd" and not getattr(args, "allgather_cp", False), "Built-in native IO requires BSHD with ordinary CP")
+    layout = getattr(args, "qkv_format", "thd")
+    require(layout in ("bshd", "thd") and not getattr(args, "allgather_cp", False),
+            "Built-in native IO requires BSHD/THD with ordinary CP")
+    ctx.metadata["input_layout"] = layout
     for field in ("reset_optimizer_states", "enable_mtp_training", "use_critic", "fp16", "optimizer_cpu_offload"):
         require(not getattr(args, field, False), f"Built-in native capture needs an adapter for {field}")
     require(getattr(args, "hf_checkpoint", None), "An HF initial checkpoint is required")
@@ -146,7 +197,31 @@ def create_session(ctx):
     models, optimizer, scheduler = native_model.setup_model_and_optimizer(args)
     _load_checkpoint_hf(models, optimizer, args, expected_checkpoint)
     ctx.metadata["precision"] = validate_native_precision(args, training, models)
+    ctx.metadata["compute_modes"] = validate_native_compute_modes(args, models)
     return args, models, optimizer, scheduler, native_model
+
+
+def native_token_positions(length, topology, cp_rank, layout, pad_multiplier=1):
+    """Positions in a one-sample microbatch; -1 denotes a padding sequence.
+
+    THD slices the sample for CP before padding the local stream for TP. That
+    trailing padding is a separate packed sequence, not part of the sample.
+    """
+    require(layout in ("bshd", "thd") and type(pad_multiplier) is int and pad_multiplier > 0,
+            "Unsupported native padding layout")
+    alignment = 2 * topology.cp if topology.cp > 1 else 1
+    if layout == "bshd":
+        alignment *= topology.tp
+    padded = math.ceil(length / alignment) * alignment
+    positions = np.arange(padded)
+    if topology.cp > 1:
+        pieces = np.split(positions, 2 * topology.cp)
+        positions = np.concatenate([pieces[cp_rank], pieces[-cp_rank-1]])
+    if layout == "thd":
+        multiple = topology.tp * pad_multiplier
+        extra = (-len(positions)) % multiple
+        positions = np.pad(positions, (0, extra), constant_values=-1)
+    return positions
 
 
 class ForwardCapture:
@@ -155,16 +230,13 @@ class ForwardCapture:
         self.handles, self.maps, self.fragments, self.seen = [], [], [], {}
         self.directory = tempfile.TemporaryDirectory(prefix="forward-", dir=ctx.writer.rank_dir)
 
-    def install(self, modules, padded_length, topology):
+    def install(self, modules, padded_length, topology, layout="bshd", pad_multiplier=1):
         import torch
         from megatron.core import parallel_state as ps
         shape = self.ctx.suite["description"]["observations"]["logits"]["shape"]
         batch, length, vocab = shape
         tp_rank, cp_rank = ps.get_tensor_model_parallel_rank(), ps.get_context_parallel_rank()
-        positions = np.arange(padded_length)
-        if topology.cp > 1:
-            pieces = np.split(positions, 2 * topology.cp)
-            positions = np.concatenate([pieces[cp_rank], pieces[-cp_rank-1]])
+        positions = native_token_positions(length, topology, cp_rank, layout, pad_multiplier)
         for chunk, module in enumerate(modules):
             if not getattr(module, "post_process", False):
                 continue
@@ -192,7 +264,7 @@ class ForwardCapture:
                 if start >= vocab:
                     return
                 for local, position in enumerate(positions):
-                    if position >= length:
+                    if position < 0 or position >= length:
                         continue
                     key = sample, int(position), start, end
                     tensor = torch.from_numpy(array[local,0,:end-start])
@@ -273,7 +345,7 @@ def run_slime(ctx):
             current[chunk] = None
         forward = ForwardCapture(ctx, current, ctx.stage["configuration"]["options"].get("output_module", "output_layer"))
         try:
-            forward.install(modules, padded, topology)
+            forward.install(modules, padded, topology, ctx.metadata["input_layout"], args.data_pad_size_multiplier)
             with SlimeStepObserver(ctx, step, models, optimizer, args, mapping=mapping):
                 result = original_step(*call_args, **kwargs)
             require(all(rows == [object_hash(s) for s in local] for rows in consumed.values()),
