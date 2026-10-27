@@ -1,7 +1,7 @@
 """Numerical correctness suites for Slime models and parallel configurations."""
 from training_parity.common import EvidenceError
 
-__version__ = "0.1.0.dev2"
+__version__ = "0.1.0.dev3"
 
 
 def prepare(spec, output):

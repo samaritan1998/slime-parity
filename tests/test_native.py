@@ -131,3 +131,58 @@ def test_actual_optimizer_configuration_must_match(observer_fixture):
     native.optimizer.param_groups[0]["lr"] *= 2
     with pytest.raises(EvidenceError, match="lr differs"):
         SlimeStepObserver(ctx, 0, [object()], native, None, mapping=mapping)
+
+
+@pytest.mark.parametrize("counter", [None, True, 1.5, float("nan"), float("inf"), "1",
+                                      torch.tensor([1.0]), torch.tensor(True)])
+@pytest.mark.parametrize("location", ["state", "group"])
+def test_native_rejects_invalid_counter_after_real_update(observer_fixture, counter, location):
+    ctx, p, mapping, native = observer_fixture
+    actual_step = native.optimizer.step
+
+    def corrupt_counter():
+        result = actual_step()
+        state = native.optimizer.state[native.master]
+        del state["step"]
+        if counter is not None:
+            target = state if location == "state" else native.optimizer.param_groups[0]
+            target["step"] = counter
+        return result
+
+    native.optimizer.step = corrupt_counter
+    p.grad = torch.ones_like(p)
+    with pytest.raises(EvidenceError, match="counter"):
+        with SlimeStepObserver(ctx, 0, [object()], native, None, mapping=mapping):
+            native.step()
+    assert not list(ctx.writer.rank_dir.glob("before-step-*"))
+
+
+def test_native_accepts_group_counter_and_checks_conflicts(observer_fixture):
+    # TE FusedAdam stores the counter in its group, while torch AdamW stores it
+    # per parameter. Both are supported, but conflicting present counters fail.
+    ctx, p, mapping, native = observer_fixture
+    actual_step = native.optimizer.step
+
+    def group_counter():
+        result = actual_step()
+        state = native.optimizer.state[native.master]
+        native.optimizer.param_groups[0]["step"] = state.pop("step")
+        return result
+
+    native.optimizer.step = group_counter
+    p.grad = torch.ones_like(p)
+    with SlimeStepObserver(ctx, 0, [object()], native, None, mapping=mapping):
+        native.step()
+    assert len(ctx.writer.rows) == 6
+
+    native.optimizer.state[native.master]["step"] = torch.tensor(1.)
+
+    def conflicting_counter():
+        result = actual_step()
+        # Parameter counter advanced to 2, group counter remains at 1.
+        return result
+
+    native.optimizer.step = conflicting_counter
+    with pytest.raises(EvidenceError, match="counter"):
+        with SlimeStepObserver(ctx, 1, [object()], native, None, mapping=mapping):
+            native.step()

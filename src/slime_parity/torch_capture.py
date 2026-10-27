@@ -1,5 +1,6 @@
 """Observe real standard PyTorch optimizer steps for independent references."""
 from training_parity.common import require
+from .optimizer_counter import check_counter
 
 
 class TorchStep:
@@ -31,7 +32,8 @@ class TorchStep:
         require(self.captured, "Capture pre-clip gradients first")
         for name, p in self.params.items():
             state = self.optimizer.state[p]
-            require("step" in state and int(state["step"]) == self.step + 1, "Optimizer counter differs from real step")
+            require("step" in state, "Missing optimizer counter")
+            check_counter(state["step"], self.step + 1, "Optimizer")
             self.ctx.write(self.step, "parameter", name, p)
             self.ctx.write(self.step, "update", name, p.detach().cpu() - self.before[name])
             for field in ("exp_avg", "exp_avg_sq"):
