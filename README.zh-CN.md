@@ -8,6 +8,8 @@ Slime Parity 用独立参考实现，验证 Slime 模型在指定并行配置范
 
 源码仓库：[samaritan1998/slime-parity](https://github.com/samaritan1998/slime-parity)。目前从仓库安装，尚未发布到 PyPI。
 
+[10 月 27 日独立验收记录](docs/acceptance-2026-10-27.zh-CN.md) 记录了 Adam 步数计数修复、源码及已安装 wheel 的 290 项 CPU 测试，以及完整 GPU 矩阵的重跑范围；整体模型验收仍未完成。
+
 [后续对照记录](docs/baseline-controls.zh-CN.md) 补充了 HF 精度配置、RoPE 差异定位和专家 DP 实验补丁。指定配置的 GPU 对照确认了归属修复，但数值验收仍未完成。
 
 [BF16 算术记录](docs/bf16-contract.zh-CN.md) 进一步拆解了前后向舍入、FA2、MoE 路由及 AdamW 标量顺序，提供独立诊断参考和状态重放工具。误差有所缩小，尚未完成门限校准与留出验收。
