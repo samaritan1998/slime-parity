@@ -144,6 +144,13 @@ GPU results apply to the frozen reference configuration recorded for each run.
 
 ## Qualifying another model or environment
 
+The optional [MoE routing diagnostics](moe-routing.md) inspect captured local
+projection/top-k/dispatch/combine boundaries. They require caller-verified
+evidence and arithmetic premises. Their `pass` is not suite acceptance; missing
+cross-end budgets or internal weighting observations remain inconclusive. The
+complete no-drop/no-pad dispatch API does not qualify distributed ownership,
+communication or the full required matrix.
+
 For a supported dense model and then an MoE model, pin Slime, Megatron,
 Transformer Engine, PyTorch, device type and checkpoint; review the independent
 parameter mapping and objective; freeze cases and thresholds. Execute the full

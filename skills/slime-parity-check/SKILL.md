@@ -99,6 +99,17 @@ sets at every requested step. A route mismatch can amplify small upstream
 differences; local top-k consistency or a spatial association does not qualify
 the full model. Do not force the reference to follow candidate routes.
 
+The optional [NumPy semantic auditor](../../docs/moe-routing.md) checks observed
+projection, selection, dispatch and combination. Validate sealed coverage,
+expert identities and probe noninterference before constructing its inputs.
+Use actual dispatch/scatter indices; never manufacture them from expected
+routes. Missing softmax or upstream error budgets remain inconclusive, even
+when routes match. Already-weighted expert outputs cannot establish internal
+probability multiplication. The example W1 capture adapter supports only its
+documented synthetic fixture and versions, not arbitrary models or distributed
+ownership. Offline corrupted observations test the auditor; acceptance also
+needs actual training fault controls.
+
 Recompute masked shifted loss from each side's own logits; check backward
 normalization separately. Identify the actual optimizer implementation and
 replay its moments/update from that side's own captured gradients and previous

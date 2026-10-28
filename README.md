@@ -26,6 +26,18 @@ rounding, FA2, MoE routing and AdamW scalar preparation, with independent
 diagnostic references and state-replay tools. Errors improve, while threshold
 calibration and held-out acceptance remain unfinished.
 
+The [MoE semantics API](docs/moe-routing.md) independently checks each endpoint's
+router projection, top-k, actual expert dispatch and combination using NumPy.
+Local results remain separate from training acceptance; missing evidence or
+independent budgets stay `inconclusive`.
+
+The [fresh-seed diagnostics](docs/cross-seed-diagnostics.md) completed 24 additional
+single-GPU/mixed-layout comparisons across three seeds. All retain numerical
+failures under the original policy; calibration and held-out validation remain
+unfinished, and the full 128-row domain is unchanged.
+Paired W1 MoE observations verify local dispatch and preweighted output sums;
+probability arithmetic and cross-end stability remain unqualified.
+
 Source: [samaritan1998/slime-parity](https://github.com/samaritan1998/slime-parity).
 Install from this repository; a PyPI release is not available yet.
 

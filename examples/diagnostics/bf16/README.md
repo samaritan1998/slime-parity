@@ -5,10 +5,12 @@ reference and native Slime training. They are **development diagnostics**, not
 qualified acceptance references. All historical failed results and thresholds
 remain unchanged. See the [measured results](../../../docs/bf16-contract.md).
 
-The helpers implement explicit forward and first-order backward formulas with
+The arithmetic helpers implement explicit forward and first-order backward formulas with
 PyTorch. No native Slime, Megatron, TE kernel or captured native output supplies
-an expected training value. Only `attention_contract_probe.py --output` imports
-TE to measure the actual side, after computing independent predictions.
+an expected training value. `attention_contract_probe.py --output` imports
+TE to measure the actual side, after computing independent predictions. The
+separate `moe_w1_capture.py` observer imports native Slime/Megatron to record
+actual calls; it supplies observations, never expected training values.
 
 ## Scope and arithmetic
 
@@ -29,6 +31,7 @@ canonical parameter mapping and optimizer remain in use.
 | `moe_fa2_reference.py` | MoE `moe_fa2` profile with independently computed attention boundaries. |
 | `attention_contract_probe.py` | Six attention ablations and a separate FP64 mathematical control. |
 | `seeded_fixture.py` | Independent weight/token seeds; generates fixtures without evaluating or selecting routes. |
+| `moe_w1_capture.py` | Source-pinned W1 observer for actual MoE routing, dispatch and combine; see its [capture contract](moe-w1-capture.md). |
 
 `packed_fa2` and `moe_fa2` support a single causal sequence per microbatch,
 head dimension 32 and sequence lengths **1–128**. They model one-tile FA2 cast
@@ -105,6 +108,30 @@ token, mask and generator hashes. Output directories are never overwritten.
 Choosing seeds alone does not establish a calibration/held-out split: freeze
 the experiment and selection rules before inspecting those results.
 
+## Capture actual W1 MoE boundaries
+
+`moe_w1_capture:run_reference` and `moe_w1_capture:run_slime` wrap the published
+`moe_fa2` reference and pinned native runner. This optional example targets the
+four-layer/four-expert/top-k-2, W1, three-step fixture with 1,428 canonical
+tensor-steps per side/case. It is not a general model or distributed observer.
+Use a separate plan, retain the uninstrumented baseline, add the observer and
+arithmetic helpers to the artifact manifest, and keep every weight/input/training/
+policy field identical. Exact source pins and unsupported modes fail closed.
+
+The [capture format](moe-w1-capture.md) describes actual permutation, expert-call
+and scatter observations. Verify sealed identities, complete coordinates and
+all canonical dtype/bytes against each side's own baseline before interpreting
+the added data. The observer does not perform that paired check for the caller.
+Only then supply reconstructed, authenticated observations to the
+[NumPy semantics API](../../../docs/moe-routing.md). Already weighted expert
+outputs cannot establish internal probability multiplication.
+
+This observer was exercised with Transformers 4.57.6 and PyTorch 2.11 on GPU /
+2.14 on CPU. The core package's lower PyTorch dependency bound does not qualify
+this optional observer's APIs. It retains extra intermediate arrays in memory
+and writes JSON/NPZ files beyond the canonical evidence budget; use the scoped
+tiny fixture and budget these observations separately.
+
 ## CPU checks
 
 ```bash
@@ -112,10 +139,12 @@ OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 \
   python -m pytest -q examples/diagnostics/bf16/tests
 ```
 
-The 84 checks cover independent FP64 formulas, joint-projection mappings and
+The arithmetic checks cover independent FP64 formulas, joint-projection mappings and
 VJPs, first-order attention boundaries, three-step optimizer trajectories,
 restoration after failures, unsupported shapes and generation without model
-execution. The dedicated CI job pins Transformers 4.57.6. These checks do not
+execution. Portable observer checks cover actual reference scatter, source
+identity, complete capture and restoration; they do not run native Megatron
+dispatch. The dedicated CI job pins Transformers 4.57.6. These checks do not
 establish GPU or parallel numerical acceptance.
 
 ## Replay AdamW from captured state

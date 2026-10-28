@@ -12,6 +12,11 @@ Slime Parity 用独立参考实现，验证 Slime 模型在指定并行配置范
 
 [BF16 算术记录](docs/bf16-contract.zh-CN.md) 进一步拆解了前后向舍入、FA2、MoE 路由及 AdamW 标量顺序，提供独立诊断参考和状态重放工具。误差有所缩小，尚未完成门限校准与留出验收。
 
+新增的 [MoE 语义检查 API](docs/moe-routing.zh-CN.md) 可独立检查各端的 router 投影、top-k、实际专家分发和合并。它只依赖 NumPy；局部检查结果与完整训练验收分开报告，缺少证据或独立预算时保持 `inconclusive`。
+
+[新种子诊断记录](docs/cross-seed-diagnostics.zh-CN.md) 补充了三个种子下的 24 个单卡及混合并行对照。全部执行完成，在原策略下仍全部数值失败；正式校准和留出验收尚未完成，原 128 个必检行保持不变。
+W1 MoE 的配对采集已验证局部分发和已加权输出的合并求和；概率算术及跨端选路稳定性仍未确定。
+
 ## 运行 CPU 示例
 
 核心比较库仅依赖 NumPy；训练适配器需要 PyTorch，HF 参考还需要 Transformers。以下命令安装 PyTorch 相关依赖并运行完整 CPU 示例：
