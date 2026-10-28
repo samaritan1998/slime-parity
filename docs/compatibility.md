@@ -52,6 +52,12 @@ activations, active per-module TE quantization overrides, forced routing and
 requested routing replay. Parameter dtype alone cannot establish those semantics.
 Inactive quantization recipe settings do not count as enabled compute.
 
+Since `0.1.0.dev3`, the actual optimizer step counter must be a finite,
+non-boolean scalar exactly equal to the completed update count. The native
+observer accepts per-parameter or per-group Adam counters, but requires at least
+one and checks both when present. Missing, fractional or contradictory counters
+invalidate the capture; they are never coerced with `int()`.
+
 The following need model/version-specific extensions and remain **unverified**
 when requested: RL rollout/objective replay, multimodal inputs, packed/ragged
 sequences, dynamic/allgather CP, GTP, heterogeneous pipelines, MTP, CPU optimizer

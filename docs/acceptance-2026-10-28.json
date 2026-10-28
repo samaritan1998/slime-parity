@@ -1,0 +1,2536 @@
+{
+  "schema_version": 1,
+  "observed_utc": "2026-10-28T06:40:41.260431+00:00",
+  "library_version": "0.1.0.dev3",
+  "fix_commit": "7bf5d7206a720b9e74aaf64dccfaa4759ba8e351",
+  "wheel_sha256": "efed3bfff156c451cbe2887d0b0d4fedd1913c9472828253e166d08b6263add9",
+  "scope": "Synthetic four-layer Qwen3 Dense and MoE, SM100 FA2, 64/65 tokens, three AdamW steps; not production-model qualification.",
+  "library_observer_report_checks": "passed_for_recorded_scope",
+  "model_numerical_acceptance": "not_passed",
+  "complete_model_qualification": false,
+  "stable_release": false,
+  "counts": {
+    "requested": 256,
+    "required": 128,
+    "completed": 112,
+    "passed": 0
+  },
+  "independent_audit_totals": {
+    "tensor_step_pairs": 125376,
+    "metric_values_checked": 2151936,
+    "gates_checked": 125376,
+    "candidate_rank_receipts": 896,
+    "independent_reference_stages": 4
+  },
+  "gpu_fault_controls_rejected": 4,
+  "source_and_installed_wheel_tests": {
+    "passed_each": 290,
+    "skipped_each": 0
+  },
+  "ci": {
+    "commit": "4bca515325a82d108e2f3cfd1f915d7da3e9705d",
+    "passed_jobs": 6,
+    "url": "https://github.com/samaritan1998/slime-parity/actions/runs/40637581637"
+  },
+  "same_allocation_observer_controls": {
+    "topology": "w8-tp2-cp1-ep1-sp1-pp1-etp2-vpp1",
+    "steps": 3,
+    "new_version_repeats": 3,
+    "repeat_pairs_bitwise_identical": 3,
+    "old_new_order": [
+      "0.1.0.dev2",
+      "0.1.0.dev3",
+      "0.1.0.dev3",
+      "0.1.0.dev2"
+    ],
+    "old_new_pairs_bitwise_identical": 6,
+    "tensor_step_pairs_per_capture": 1428,
+    "cross_allocation_repeatability_proven": false,
+    "historical_moe_cross_allocation_differences_retained": true
+  },
+  "models": {
+    "dense": {
+      "counts": {
+        "requested": 128,
+        "required": 48,
+        "completed": 48,
+        "passed": 0,
+        "validation": {
+          "numerical_failure": 48
+        },
+        "execution": {
+          "complete": 48,
+          "invalid": 16,
+          "not_applicable": 64
+        }
+      },
+      "numerical_status": "numerical_failure",
+      "report_mode": "gpu_job_report_and_audit",
+      "outer_gpu_process_exit_receipt": true,
+      "independent_report_audit": {
+        "audit_status": "passed",
+        "tensor_step_pairs": 33984,
+        "metric_values_checked": 585216,
+        "gates_checked": 33984,
+        "candidate_rank_receipts": 384,
+        "independent_reference_stages": 2,
+        "mismatches": []
+      },
+      "counter_controls": [
+        {
+          "fault": "missing_counter",
+          "actual_error": "Missing native Adam counter",
+          "reference_verified": true,
+          "candidate_rejected": true
+        },
+        {
+          "fault": "fractional_counter",
+          "actual_error": "Native Adam group counter must equal the completed update count 1",
+          "reference_verified": true,
+          "candidate_rejected": true
+        }
+      ],
+      "matrix_result_sha256": "8798df7722f60b852d554ae537832772bd5ac0ab79d4ae476328f40f9aad3245",
+      "coverage": {
+        "rows": [
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep1-sp0-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 66
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep1-sp0-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 66
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep1-sp0-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 66
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep1-sp0-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 66
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep1-sp1-pp1-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep1-sp1-pp1-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep1-sp1-pp2-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep1-sp1-pp2-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep2-sp0-pp1-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep2-sp0-pp1-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep2-sp0-pp2-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep2-sp0-pp2-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep2-sp1-pp1-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep2-sp1-pp1-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep2-sp1-pp2-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep2-sp1-pp2-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep1-sp0-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 78
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep1-sp0-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 78
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep1-sp0-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 78
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep1-sp0-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 78
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep1-sp1-pp1-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep1-sp1-pp1-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep1-sp1-pp2-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep1-sp1-pp2-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep2-sp0-pp1-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep2-sp0-pp1-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep2-sp0-pp2-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep2-sp0-pp2-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep2-sp1-pp1-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep2-sp1-pp1-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep2-sp1-pp2-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep2-sp1-pp2-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep1-sp0-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 76
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep1-sp0-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 76
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep1-sp0-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 76
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep1-sp0-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 76
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep1-sp1-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 77
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep1-sp1-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 77
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep1-sp1-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 77
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep1-sp1-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 77
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep2-sp0-pp1-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep2-sp0-pp1-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep2-sp0-pp2-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep2-sp0-pp2-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep2-sp1-pp1-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep2-sp1-pp1-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep2-sp1-pp2-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep2-sp1-pp2-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep1-sp0-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 79
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep1-sp0-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 79
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep1-sp0-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 79
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep1-sp0-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 79
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep1-sp1-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 80
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep1-sp1-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 80
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep1-sp1-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 80
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep1-sp1-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 80
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep2-sp0-pp1-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep2-sp0-pp1-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep2-sp0-pp2-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep2-sp0-pp2-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep2-sp1-pp1-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep2-sp1-pp1-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep2-sp1-pp2-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep2-sp1-pp2-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep1-sp0-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 69
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep1-sp0-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 69
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep1-sp0-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 69
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep1-sp0-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 69
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep1-sp1-pp1-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep1-sp1-pp1-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep1-sp1-pp2-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep1-sp1-pp2-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep2-sp0-pp1-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep2-sp0-pp1-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep2-sp0-pp2-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep2-sp0-pp2-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep2-sp1-pp1-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep2-sp1-pp1-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep2-sp1-pp2-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep2-sp1-pp2-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep1-sp0-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 78
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep1-sp0-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 78
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep1-sp0-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 78
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep1-sp0-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 78
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep1-sp1-pp1-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep1-sp1-pp1-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep1-sp1-pp2-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep1-sp1-pp2-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep2-sp0-pp1-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep2-sp0-pp1-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep2-sp0-pp2-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep2-sp0-pp2-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep2-sp1-pp1-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep2-sp1-pp1-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep2-sp1-pp2-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep2-sp1-pp2-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep1-sp0-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 78
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep1-sp0-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 78
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep1-sp0-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 78
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep1-sp0-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 78
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep1-sp1-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 79
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep1-sp1-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 79
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep1-sp1-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 79
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep1-sp1-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 79
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep2-sp0-pp1-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep2-sp0-pp1-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep2-sp0-pp2-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep2-sp0-pp2-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep2-sp1-pp1-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep2-sp1-pp1-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep2-sp1-pp2-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep2-sp1-pp2-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep1-sp0-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 79
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep1-sp0-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 79
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep1-sp0-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 79
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep1-sp0-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 79
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep1-sp1-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 79
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep1-sp1-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 79
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep1-sp1-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 79
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep1-sp1-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 708,
+            "failed_gates": 79
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep2-sp0-pp1-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep2-sp0-pp1-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep2-sp0-pp2-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep2-sp0-pp2-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep2-sp1-pp1-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep2-sp1-pp1-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep2-sp1-pp2-etp1-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep2-sp1-pp2-etp2-vpp1",
+            "eligibility": "not_applicable",
+            "execution": "not_applicable",
+            "validation": "unverified"
+          }
+        ],
+        "gates": 33984,
+        "failed_gates": 3672,
+        "failed_gates_by_role": {
+          "gradient": 418,
+          "update": 2570,
+          "exp_avg": 684
+        },
+        "execution_failures": [],
+        "suite_sha256": "63307b82aaf2d00c1f8bd25aac90674d0e3161c2a898ad888d9b791f887f5f44",
+        "plan_sha256": {
+          "text": "4d37bdc1a1857137baf85b84000bd768e621647afd8f7d7a81b3991a19d71895",
+          "masked-boundaries": "207740243e686baed63abffa2a7373e0f7b7cec0f71b07833dce28204821b5d5"
+        },
+        "policy": [
+          {
+            "id": "forward",
+            "scope": "tensor",
+            "select": {
+              "roles": [
+                "forward"
+              ]
+            },
+            "limits": {
+              "max_abs": 0.025,
+              "relative_l2": 0.025
+            }
+          },
+          {
+            "id": "loss",
+            "scope": "tensor",
+            "select": {
+              "roles": [
+                "loss"
+              ]
+            },
+            "limits": {
+              "max_abs": 0.01
+            }
+          },
+          {
+            "id": "gradient",
+            "scope": "tensor",
+            "select": {
+              "roles": [
+                "gradient"
+              ]
+            },
+            "limits": {
+              "atol": 0.0001,
+              "rtol": 0.05,
+              "relative_l2": 0.05
+            }
+          },
+          {
+            "id": "initial",
+            "scope": "tensor",
+            "select": {
+              "roles": [
+                "initial"
+              ]
+            },
+            "limits": {
+              "max_abs": 5e-05
+            }
+          },
+          {
+            "id": "parameter",
+            "scope": "tensor",
+            "select": {
+              "roles": [
+                "parameter"
+              ]
+            },
+            "limits": {
+              "max_abs": 5e-05
+            }
+          },
+          {
+            "id": "update",
+            "scope": "tensor",
+            "select": {
+              "roles": [
+                "update"
+              ]
+            },
+            "limits": {
+              "max_abs": 3e-06,
+              "relative_l2": 0.15
+            }
+          },
+          {
+            "id": "exp_avg",
+            "scope": "tensor",
+            "select": {
+              "roles": [
+                "exp_avg"
+              ]
+            },
+            "limits": {
+              "atol": 1e-05,
+              "rtol": 0.05,
+              "relative_l2": 0.05
+            }
+          },
+          {
+            "id": "exp_avg_sq",
+            "scope": "tensor",
+            "select": {
+              "roles": [
+                "exp_avg_sq"
+              ]
+            },
+            "limits": {
+              "atol": 1e-08,
+              "rtol": 0.1,
+              "relative_l2": 0.1
+            }
+          }
+        ]
+      }
+    },
+    "moe": {
+      "counts": {
+        "requested": 128,
+        "required": 80,
+        "completed": 64,
+        "passed": 0,
+        "validation": {
+          "numerical_failure": 64,
+          "unverified": 16
+        },
+        "execution": {
+          "complete": 64,
+          "invalid": 48,
+          "execution_failure": 16
+        }
+      },
+      "numerical_status": "numerical_failure",
+      "report_mode": "posthoc_cpu_report_with_separate_gpu_fault_controls",
+      "outer_gpu_process_exit_receipt": false,
+      "independent_report_audit": {
+        "audit_status": "passed",
+        "tensor_step_pairs": 91392,
+        "metric_values_checked": 1566720,
+        "gates_checked": 91392,
+        "candidate_rank_receipts": 512,
+        "independent_reference_stages": 2,
+        "mismatches": []
+      },
+      "counter_controls": [
+        {
+          "fault": "missing_counter",
+          "actual_error": "Missing native Adam counter",
+          "reference_verified": true,
+          "candidate_rejected": true,
+          "plan_sha256": "9534bbf1c9e5f3ce39ddf0f8d916ceea6f93628f771fdb6bf40fa3958162e3c2",
+          "reference_rank_receipts": {
+            "rank0.json": "912aee3615278eec090bc4d47e5f035410259c9a0a40f55918b2f6dfffc44ff4"
+          },
+          "failure_sha256": "767b87c02391d0f84a821e9a125ff009222f07c50777ff39a61e060502544996",
+          "log_sha256": "ca4eee812b0db361452144137e5c381d56c3ba16f34f3d2e06edb0c727833870"
+        },
+        {
+          "fault": "fractional_counter",
+          "actual_error": "Native Adam group counter must equal the completed update count 1",
+          "reference_verified": true,
+          "candidate_rejected": true,
+          "plan_sha256": "5be2c007a0134ebe45e936eecde08dffc30cebb8dd98b837ba895557d7d54190",
+          "reference_rank_receipts": {
+            "rank0.json": "dc268bef811515cbfb14ce7d44a8fe171f3b8e2cf8658d69c0e857cc934f8d2b"
+          },
+          "failure_sha256": "972fe3dd29d010522724d0f145e6d93693769d838b45af84f8c424858f1a242e",
+          "log_sha256": "41a02277d4525f3189c6c97d72a8f034da32d87dd081391a9019eb654dedaf5d"
+        }
+      ],
+      "matrix_result_sha256": "e5bbc3c442c65c1b11c626207712d081ab3dfe9d059f439ac0a5ba4a2fc24326",
+      "coverage": {
+        "rows": [
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep1-sp0-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 320
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep1-sp0-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 374
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep1-sp0-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 320
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep1-sp0-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 374
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep1-sp1-pp1-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep1-sp1-pp1-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep1-sp1-pp2-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep1-sp1-pp2-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep2-sp0-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 320
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep2-sp0-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 374
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep2-sp0-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 320
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep2-sp0-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 374
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep2-sp1-pp1-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep2-sp1-pp1-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep2-sp1-pp2-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp1-ep2-sp1-pp2-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep1-sp0-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 411
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep1-sp0-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 406
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep1-sp0-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 411
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep1-sp0-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 406
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep1-sp1-pp1-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep1-sp1-pp1-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep1-sp1-pp2-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep1-sp1-pp2-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep2-sp0-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 411
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep2-sp0-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 406
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep2-sp0-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 411
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep2-sp0-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 406
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep2-sp1-pp1-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep2-sp1-pp1-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep2-sp1-pp2-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp1-cp2-ep2-sp1-pp2-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep1-sp0-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "execution_failure",
+            "validation": "unverified",
+            "cause": "moe_tp_without_sp_backend_guard"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep1-sp0-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "execution_failure",
+            "validation": "unverified",
+            "cause": "moe_tp_without_sp_backend_guard"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep1-sp0-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "execution_failure",
+            "validation": "unverified",
+            "cause": "moe_tp_without_sp_backend_guard"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep1-sp0-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "execution_failure",
+            "validation": "unverified",
+            "cause": "moe_tp_without_sp_backend_guard"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep1-sp1-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 436
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep1-sp1-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 449
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep1-sp1-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 436
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep1-sp1-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 449
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep2-sp0-pp1-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep2-sp0-pp1-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep2-sp0-pp2-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep2-sp0-pp2-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep2-sp1-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 436
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep2-sp1-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 449
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep2-sp1-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 436
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep2-sp1-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 467
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep1-sp0-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "execution_failure",
+            "validation": "unverified",
+            "cause": "moe_tp_without_sp_backend_guard"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep1-sp0-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "execution_failure",
+            "validation": "unverified",
+            "cause": "moe_tp_without_sp_backend_guard"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep1-sp0-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "execution_failure",
+            "validation": "unverified",
+            "cause": "moe_tp_without_sp_backend_guard"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep1-sp0-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "execution_failure",
+            "validation": "unverified",
+            "cause": "moe_tp_without_sp_backend_guard"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep1-sp1-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 420
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep1-sp1-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 424
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep1-sp1-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 420
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep1-sp1-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 424
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep2-sp0-pp1-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep2-sp0-pp1-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep2-sp0-pp2-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep2-sp0-pp2-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep2-sp1-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 420
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep2-sp1-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 433
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep2-sp1-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 420
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep2-sp1-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 433
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep1-sp0-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 308
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep1-sp0-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 378
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep1-sp0-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 308
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep1-sp0-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 378
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep1-sp1-pp1-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep1-sp1-pp1-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep1-sp1-pp2-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep1-sp1-pp2-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep2-sp0-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 308
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep2-sp0-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 369
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep2-sp0-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 308
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep2-sp0-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 369
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep2-sp1-pp1-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep2-sp1-pp1-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep2-sp1-pp2-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp1-ep2-sp1-pp2-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep1-sp0-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 422
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep1-sp0-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 470
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep1-sp0-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 422
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep1-sp0-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 470
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep1-sp1-pp1-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep1-sp1-pp1-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep1-sp1-pp2-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep1-sp1-pp2-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep2-sp0-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 421
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep2-sp0-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 470
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep2-sp0-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 422
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep2-sp0-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 470
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep2-sp1-pp1-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep2-sp1-pp1-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep2-sp1-pp2-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp1-cp2-ep2-sp1-pp2-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep1-sp0-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "execution_failure",
+            "validation": "unverified",
+            "cause": "moe_tp_without_sp_backend_guard"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep1-sp0-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "execution_failure",
+            "validation": "unverified",
+            "cause": "moe_tp_without_sp_backend_guard"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep1-sp0-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "execution_failure",
+            "validation": "unverified",
+            "cause": "moe_tp_without_sp_backend_guard"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep1-sp0-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "execution_failure",
+            "validation": "unverified",
+            "cause": "moe_tp_without_sp_backend_guard"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep1-sp1-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 486
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep1-sp1-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 516
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep1-sp1-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 486
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep1-sp1-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 512
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep2-sp0-pp1-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep2-sp0-pp1-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep2-sp0-pp2-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep2-sp0-pp2-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep2-sp1-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 486
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep2-sp1-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 522
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep2-sp1-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 486
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep2-sp1-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 523
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep1-sp0-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "execution_failure",
+            "validation": "unverified",
+            "cause": "moe_tp_without_sp_backend_guard"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep1-sp0-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "execution_failure",
+            "validation": "unverified",
+            "cause": "moe_tp_without_sp_backend_guard"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep1-sp0-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "execution_failure",
+            "validation": "unverified",
+            "cause": "moe_tp_without_sp_backend_guard"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep1-sp0-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "execution_failure",
+            "validation": "unverified",
+            "cause": "moe_tp_without_sp_backend_guard"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep1-sp1-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 501
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep1-sp1-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 509
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep1-sp1-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 501
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep1-sp1-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 509
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep2-sp0-pp1-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep2-sp0-pp1-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep2-sp0-pp2-etp1-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep2-sp0-pp2-etp2-vpp1",
+            "eligibility": "invalid",
+            "execution": "invalid",
+            "validation": "unverified"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep2-sp1-pp1-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 501
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep2-sp1-pp1-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 518
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep2-sp1-pp2-etp1-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 501
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep2-sp1-pp2-etp2-vpp1",
+            "eligibility": "eligible",
+            "execution": "complete",
+            "validation": "numerical_failure",
+            "gates": 1428,
+            "failed_gates": 518
+          }
+        ],
+        "gates": 91392,
+        "failed_gates": 27364,
+        "failed_gates_by_role": {
+          "forward": 188,
+          "gradient": 7059,
+          "update": 12239,
+          "exp_avg": 7332,
+          "exp_avg_sq": 454,
+          "parameter": 92
+        },
+        "execution_failures": [
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep1-sp0-pp1-etp1-vpp1",
+            "failure_sha256": "16f6a20c3d66da68baa85b2637688406f9f9111744f81b06a0afb7b473187843",
+            "log_sha256": "934c53964d66eff48cd665c38c096a29dc6dc2b1ec9741c1482a50dfdcb2e8d6"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep1-sp0-pp1-etp2-vpp1",
+            "failure_sha256": "84cf0520bf9be5db0efa9307c7d085030416e46288a5ac73c1313b4f3f5621ec",
+            "log_sha256": "8a24270f085ecad19a6fcbb356bea7f6347843cd5a0efa27a8216589c8a4708b"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep1-sp0-pp2-etp1-vpp1",
+            "failure_sha256": "6e8b7095d917f327f926beadf219e75fe2cc7f41541e61b2fed9fc2c7495bf3e",
+            "log_sha256": "7fd4e5307de4ccea6f6a7440d8cd27960149035b2871a87a201dae7e6e2732f7"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp1-ep1-sp0-pp2-etp2-vpp1",
+            "failure_sha256": "7b428f687fb9a5cb2b21b54e70e8e726620a9eab837217b391cf14766046d440",
+            "log_sha256": "b45943404caca963ef407c3d527044ecc3ab6dd30ede69c6bd1f157aa68aa1cf"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep1-sp0-pp1-etp1-vpp1",
+            "failure_sha256": "273b2ab838a68571aa8130fae2aaf4c643916b3f39e6d8b07cc09aa5c253e4ed",
+            "log_sha256": "375cfcab2c4109f21f63f12d4b1babe9c9a6fe47a9f626d385f3425597ee2fc3"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep1-sp0-pp1-etp2-vpp1",
+            "failure_sha256": "06f9e82f2364f5d687b4df95f88749d8d945061eb5b911a697f8ab225b9ba388",
+            "log_sha256": "58cfa3f778212756965398d8253ee846bd004f9986bc78ae38c410d4940da6a0"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep1-sp0-pp2-etp1-vpp1",
+            "failure_sha256": "c7a85bf5af20660ab01868240c31cded213327d3d7cfb88bd034d71f476e5f12",
+            "log_sha256": "bb3dd3f8ae4232f09a10c896e8031cf4766ee869adee759c57b67407116f6439"
+          },
+          {
+            "case": "text",
+            "id": "w8-tp2-cp2-ep1-sp0-pp2-etp2-vpp1",
+            "failure_sha256": "27eed01a43be0da437b3b5b447783e4a697c0451b649ba43c6927ef1e1bf1a35",
+            "log_sha256": "6843496a0a6aa1955a5c44fb16db1d7bcd1f3d7de4d1704a396ff162789a63d8"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep1-sp0-pp1-etp1-vpp1",
+            "failure_sha256": "feb8cab20e36623fa430a084ad62c7eb4fb8f18d73f83b9807bf7720de91ccae",
+            "log_sha256": "8acde2b447034ca6af4474d7a62978f5ea95dc50d20bac9b937e1e73963d11d0"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep1-sp0-pp1-etp2-vpp1",
+            "failure_sha256": "e056697d1dbf44933e65a481210e580e451cd4ab5e4b0fa67018516d12d9dbc2",
+            "log_sha256": "c2f5b6c13ac6cebbc47abc50493c77fe4986b285f06f25dd7577361f9b9510f9"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep1-sp0-pp2-etp1-vpp1",
+            "failure_sha256": "dfa912be54aff49c5cc89129fe820265b289ebf1a8023b8343521202dcac8f3e",
+            "log_sha256": "d61db57a53734e8008990f35107817e2b717bb040be49adcdd7e5e83eb08c882"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp1-ep1-sp0-pp2-etp2-vpp1",
+            "failure_sha256": "a77c621052458acca5c68bd2f1ed3483e44c2a889f31befd3033f35f01a6c3d7",
+            "log_sha256": "bab92a422eebbd3c55abc3b9d88dc2831b1946b0137e6fb9f7eb6f6037f40b57"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep1-sp0-pp1-etp1-vpp1",
+            "failure_sha256": "8c1b4427c9ed0cd682c61ec7c310cd603708afae6e1186e66de0dcb92479b7ef",
+            "log_sha256": "b988f02cd63a4c78069f9175770761c66d6ab5d4c41b52eaff78563ed8d0b6cd"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep1-sp0-pp1-etp2-vpp1",
+            "failure_sha256": "33c3ed27a30ebb23c1fcdb178cfc80c6d074b4d7df4691e703a3d2437807c2eb",
+            "log_sha256": "20e3a5175972ac0a0947a3f6b4caa4af9523ff6cb8b354b1794acff43c6cce3e"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep1-sp0-pp2-etp1-vpp1",
+            "failure_sha256": "167babe56a92e7666e73f25921533b6de2d0942bb440b2effabbdf9eaf82121e",
+            "log_sha256": "12165da716b55f7abcb98f0e84656281b9aa57e9a1c4f1d5cf15f528102cac0f"
+          },
+          {
+            "case": "masked-boundaries",
+            "id": "w8-tp2-cp2-ep1-sp0-pp2-etp2-vpp1",
+            "failure_sha256": "b31a975f14af32a6a0084668c1a4b750f8e97bc34a562215ab8f22fe278fe784",
+            "log_sha256": "6263d2e115d8f208baa57bdc8e248545208e6570144c8f7d868990d14291ac14"
+          }
+        ],
+        "suite_sha256": "4874efc3d7ed56769703041b712f490544e2693cd89910d27551bc4b80853f34",
+        "plan_sha256": {
+          "text": "7812025cd6c6ce6ee8d0c563d227eedbd6ce94653050fe8d43d958e4c43f9318",
+          "masked-boundaries": "1698722e7a8e3280aa9406f0ff1664df693663414f0710914338d9fda585a9f6"
+        },
+        "policy": [
+          {
+            "id": "forward",
+            "scope": "tensor",
+            "select": {
+              "roles": [
+                "forward"
+              ]
+            },
+            "limits": {
+              "max_abs": 0.025,
+              "relative_l2": 0.025
+            }
+          },
+          {
+            "id": "loss",
+            "scope": "tensor",
+            "select": {
+              "roles": [
+                "loss"
+              ]
+            },
+            "limits": {
+              "max_abs": 0.01
+            }
+          },
+          {
+            "id": "gradient",
+            "scope": "tensor",
+            "select": {
+              "roles": [
+                "gradient"
+              ]
+            },
+            "limits": {
+              "atol": 0.0001,
+              "rtol": 0.05,
+              "relative_l2": 0.05
+            }
+          },
+          {
+            "id": "initial",
+            "scope": "tensor",
+            "select": {
+              "roles": [
+                "initial"
+              ]
+            },
+            "limits": {
+              "max_abs": 5e-05
+            }
+          },
+          {
+            "id": "parameter",
+            "scope": "tensor",
+            "select": {
+              "roles": [
+                "parameter"
+              ]
+            },
+            "limits": {
+              "max_abs": 5e-05
+            }
+          },
+          {
+            "id": "update",
+            "scope": "tensor",
+            "select": {
+              "roles": [
+                "update"
+              ]
+            },
+            "limits": {
+              "max_abs": 3e-06,
+              "relative_l2": 0.15
+            }
+          },
+          {
+            "id": "exp_avg",
+            "scope": "tensor",
+            "select": {
+              "roles": [
+                "exp_avg"
+              ]
+            },
+            "limits": {
+              "atol": 1e-05,
+              "rtol": 0.05,
+              "relative_l2": 0.05
+            }
+          },
+          {
+            "id": "exp_avg_sq",
+            "scope": "tensor",
+            "select": {
+              "roles": [
+                "exp_avg_sq"
+              ]
+            },
+            "limits": {
+              "atol": 1e-08,
+              "rtol": 0.1,
+              "relative_l2": 0.1
+            }
+          }
+        ]
+      }
+    }
+  },
+  "limitations": [
+    "Original numerical policy remains unchanged; all 112 completed rows fail it.",
+    "All 16 MoE TP>1/SPoff backend guard failures remain required and unverified.",
+    "MoE outer GPU reporting process was interrupted; sealed stages were audited by a fresh CPU process. No outer GPU success receipt was fabricated.",
+    "Healthy independent model controls, held-out validation, and complete backend-domain support remain unfinished."
+  ]
+}

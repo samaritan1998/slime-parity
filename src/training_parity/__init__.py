@@ -1,5 +1,5 @@
 """Numerical evidence and comparisons without a model or cluster dependency."""
-__version__ = "0.1.0.dev2"
+__version__ = "0.1.0.dev3"
 
 from .common import EvidenceError
 from .metrics import compare_arrays

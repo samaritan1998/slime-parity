@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "slime-parity"
-version = "0.1.0.dev2"
+version = "0.1.0.dev3"
 description = "Model reference and parallel configuration correctness suites for Slime"
 readme = "README.md"
 license = "Apache-2.0"

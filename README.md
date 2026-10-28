@@ -17,6 +17,12 @@ unverified. No row passes the unchanged numerical policy. See the
 and [current boundaries](docs/compatibility.md).
 These results do not qualify all Slime models or all parallel configurations.
 
+The [October 27–28 acceptance record (Chinese)](docs/acceptance-2026-10-27.zh-CN.md)
+and [structured results](docs/acceptance-2026-10-28.json) cover the Adam counter
+fix, 290 source and 290 installed-wheel CPU tests, four real GPU fault controls,
+and independent recomputation of 2,151,936 report metrics. These observer and
+report checks passed for the recorded scope; model numerical qualification did not.
+
 The [follow-up controls](docs/baseline-controls.md) document explicit HF precision
 settings, RoPE localization and an experimental expert-DP patch. Scoped GPU
 controls confirm the ownership repair; numerical acceptance remains incomplete.
@@ -143,7 +149,7 @@ python -m twine check dist/*
 Tests cover matrix enumeration, global coordinates, corruption and incomplete
 evidence, actual optimizer capture, fault injection, HF execution and Gloo DP.
 Native observer tests use a small boundary harness; they do not certify
-Megatron or Slime GPU execution. CPU CI is configured for Python 3.11–3.13.
+Megatron or Slime GPU execution. CPU CI is configured for Python 3.10–3.13.
 See [Actions](https://github.com/samaritan1998/slime-parity/actions) for run results
 and [contributing](CONTRIBUTING.md) for development guidance.
 

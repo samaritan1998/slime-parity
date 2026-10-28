@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: ['3.11', '3.12', '3.13']
+        python: ['3.10', '3.11', '3.12', '3.13']
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -30,5 +30,25 @@ jobs:
       - run: python -m pytest -q examples/diagnostics/bf16/tests
         env:
           PYTHONPATH: src:examples/diagnostics/bf16
+          OMP_NUM_THREADS: '1'
+          MKL_NUM_THREADS: '1'
+  installed-wheel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+      - run: python -m pip install build pytest twine 'transformers==4.57.6' safetensors
+      - run: python -m build && python -m twine check dist/*
+      - run: python -m pip install dist/*.whl
+      - name: Test the installed package outside the checkout
+        run: |
+          cd "$RUNNER_TEMP"
+          python -c 'import os, pathlib, slime_parity; assert not pathlib.Path(slime_parity.__file__).is_relative_to(pathlib.Path(os.environ["GITHUB_WORKSPACE"]))'
+          python -m pytest -q "$GITHUB_WORKSPACE/tests" "$GITHUB_WORKSPACE/examples/diagnostics/bf16/tests"
+        env:
+          PYTHONPATH: ${{ github.workspace }}/examples/diagnostics/bf16
           OMP_NUM_THREADS: '1'
           MKL_NUM_THREADS: '1'

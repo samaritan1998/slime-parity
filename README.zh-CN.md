@@ -8,6 +8,8 @@ Slime Parity 用独立参考实现，验证 Slime 模型在指定并行配置范
 
 源码仓库：[samaritan1998/slime-parity](https://github.com/samaritan1998/slime-parity)。目前从仓库安装，尚未发布到 PyPI。
 
+[10 月 27–28 日独立验收记录](docs/acceptance-2026-10-27.zh-CN.md) 记录了 Adam 步数计数修复、源码及已安装 wheel 各 290 项 CPU 测试、四个真实 GPU 故障检出用例，以及 112 个已执行配置的报告复算。约 215 万个指标复算一致；模型数值验收仍未通过。
+
 [后续对照记录](docs/baseline-controls.zh-CN.md) 补充了 HF 精度配置、RoPE 差异定位和专家 DP 实验补丁。指定配置的 GPU 对照确认了归属修复，但数值验收仍未完成。
 
 [BF16 算术记录](docs/bf16-contract.zh-CN.md) 进一步拆解了前后向舍入、FA2、MoE 路由及 AdamW 标量顺序，提供独立诊断参考和状态重放工具。误差有所缩小，尚未完成门限校准与留出验收。
@@ -91,7 +93,7 @@ python -m build
 python -m twine check dist/*
 ```
 
-测试覆盖矩阵枚举、全局坐标、损坏或缺失的证据、实际优化器采集、故障注入、HF 执行和 Gloo 数据并行。原生观察器测试使用小型接口测试模型，不能据此认定 Megatron 或 Slime GPU 已兼容。CPU CI 配置覆盖 Python 3.11–3.13；运行结果见 [Actions](https://github.com/samaritan1998/slime-parity/actions)，开发约定见 [贡献指南](CONTRIBUTING.md)。
+测试覆盖矩阵枚举、全局坐标、损坏或缺失的证据、实际优化器采集、故障注入、HF 执行和 Gloo 数据并行。原生观察器测试使用小型接口测试模型，不能据此认定 Megatron 或 Slime GPU 已兼容。CPU CI 配置覆盖 Python 3.10–3.13；运行结果见 [Actions](https://github.com/samaritan1998/slime-parity/actions)，开发约定见 [贡献指南](CONTRIBUTING.md)。
 
 仓库提供可复用的 [Slime Parity Skill](skills/slime-parity-check/SKILL.md)，用于模型接入、验证执行和结果解读。`training_parity` 包继续提供底层张量证据与比较接口。
 

@@ -10,6 +10,7 @@ import numpy as np
 from training_parity.common import require
 from .mapping import MegatronMapping, write_collective, torch_chunks
 from .topology import observe_megatron_groups
+from .optimizer_counter import check_native_counter
 
 
 def master_parameter(optimizer, parameter):
@@ -150,37 +151,38 @@ class SlimeStepObserver:
         result = self.original_step(*args, **kwargs)
         require(isinstance(result, tuple) and len(result) == 3 and bool(result[0]), "Native optimizer skipped or failed the update")
         require(self.captured, "Native optimizer did not expose prepared gradients")
+        for row in self.shards.values():
+            check_native_counter(row["optimizer"].state[row["parameter"]], row["group"], self.step + 1)
         masters = self.masters()
         deltas, maps = {}, []
-        for i, (name, value) in enumerate(masters.items()):
-            old = self.before[name]
-            path = Path(self.temporary.name) / f"delta-{i}.bin"
-            array = np.memmap(path, dtype=old.dtype, mode="w+", shape=old.shape)
-            cursor = 0
-            for chunk in torch_chunks(value):
-                end = cursor + chunk.size
-                array[cursor:end] = chunk - old[cursor:end]
-                cursor = end
-            array.flush()
-            maps.append(array)
-            deltas[name] = torch.from_numpy(array)
-        self.emit("update", deltas)
-        self.emit("parameter", masters)
-        for field in ("exp_avg", "exp_avg_sq"):
-            values = {}
-            for name, row in self.shards.items():
-                state = row["optimizer"].state[row["parameter"]]
-                require(field in state, f"Missing native {field}")
-                require("step" not in state or int(state["step"]) == self.step + 1, "Native Adam counter differs")
-                group = row["group"]
-                require("step" not in group or int(group["step"]) == self.step + 1, "Native Adam group counter differs")
-                value = (row["optimizer"].get_unscaled_state(row["parameter"], field)
-                         if hasattr(row["optimizer"], "get_unscaled_state") else state[field])
-                values[name] = value
-            self.emit(field, values)
-        deltas.clear()
-        for array in maps:
-            array._mmap.close()
+        try:
+            for i, (name, value) in enumerate(masters.items()):
+                old = self.before[name]
+                path = Path(self.temporary.name) / f"delta-{i}.bin"
+                array = np.memmap(path, dtype=old.dtype, mode="w+", shape=old.shape)
+                maps.append(array)
+                cursor = 0
+                for chunk in torch_chunks(value):
+                    end = cursor + chunk.size
+                    array[cursor:end] = chunk - old[cursor:end]
+                    cursor = end
+                array.flush()
+                deltas[name] = torch.from_numpy(array)
+            self.emit("update", deltas)
+            self.emit("parameter", masters)
+            for field in ("exp_avg", "exp_avg_sq"):
+                values = {}
+                for name, row in self.shards.items():
+                    state = row["optimizer"].state[row["parameter"]]
+                    require(field in state, f"Missing native {field}")
+                    value = (row["optimizer"].get_unscaled_state(row["parameter"], field)
+                             if hasattr(row["optimizer"], "get_unscaled_state") else state[field])
+                    values[name] = value
+                self.emit(field, values)
+        finally:
+            deltas.clear()
+            for array in maps:
+                array._mmap.close()
         self.updated = True
         return result
 
